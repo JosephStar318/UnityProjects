@@ -15,8 +15,13 @@ public class MyCharacterController : MonoBehaviour
     [Header("Physics")]
     public float mass;
     public float gravity;
-    public float jumpForce;
-    public float jumpDecrease;
+    private float curGrav;
+    private float jumpForce;
+    public float jumpAcceleration;
+    public float jumpVelocity;
+    public float jumpHeight;
+
+
     public float maxHeight;
     public float minWidth;
 
@@ -32,7 +37,6 @@ public class MyCharacterController : MonoBehaviour
     public float slopeDecendSpeed;
 
     private bool grounded;
-    private float curGrav;
     private float horizontalAxis;
     private float vertiaclAxis;
     private float xMouseAxis;
@@ -54,7 +58,7 @@ public class MyCharacterController : MonoBehaviour
     private void OnDrawGizmos()
     {
         Vector3 boxSize = new Vector3(minWidth / 2, 0.1f, minWidth / 2);
-        Vector3 boxPos = new Vector3(transform.position.x, transform.position.y - maxHeight / 2 - boxSize.y / 2, transform.position.z);
+        Vector3 boxPos = new Vector3(transform.position.x, transform.position.y - maxHeight / 2 + boxSize.y / 2, transform.position.z);
         if (!grounded)
             Gizmos.color = Color.red;
         else
@@ -64,16 +68,28 @@ public class MyCharacterController : MonoBehaviour
         Vector3 l = transform.TransformPoint(sensorLocal);
         Gizmos.DrawSphere(l, 0.2f);
     }
-    private float jumpHeight;
     private Vector3 moveVector;
     private Vector3 currentRotation;
     private float maxYAngle = 80;
+    private float jumpTimeStart;
     private void GetUserInput()
     {
         horizontalAxis = Input.GetAxis("Horizontal");
         vertiaclAxis = Input.GetAxis("Vertical");
         xMouseAxis = Input.GetAxis("Mouse X");
         yMouseAxis = Input.GetAxis("Mouse Y");
+        if (grounded)
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                jumpForce = 75;
+                curGrav = gravity;
+            }
+        }
+        else
+        {
+            curGrav = gravity;
+        }
     }
     private void MouseLook()
     {
@@ -92,7 +108,7 @@ public class MyCharacterController : MonoBehaviour
         //}
 
         /*For TPS or FPS camera*/
-        currentRotation.x += xMouseAxis* mouseSensivity;
+        currentRotation.x += xMouseAxis * mouseSensivity;
         currentRotation.y -= yMouseAxis * mouseSensivity;
         currentRotation.x = Mathf.Repeat(currentRotation.x, 360);
         currentRotation.y = Mathf.Clamp(currentRotation.y, -maxYAngle, maxYAngle);
@@ -109,13 +125,13 @@ public class MyCharacterController : MonoBehaviour
     private void FinalMovement()
     {
         Debug.DrawRay(transform.position, transform.forward, Color.red,0.2f);
-        Vector3 movement = new Vector3(moveVector.x, (-curGrav + jumpHeight), moveVector.z) * moveSpeed;
+        Vector3 movement = new Vector3(moveVector.x, moveVector.y, moveVector.z);
         movement = transform.TransformDirection(movement);
         transform.position += movement;
     }
     private void SimpleMove()
     {
-        moveVector = CollisionSlopeCheck(new Vector3(horizontalAxis,0,vertiaclAxis)*axisSpeed);
+        moveVector = CollisionSlopeCheck(new Vector3(horizontalAxis, 0, vertiaclAxis) * axisSpeed) * moveSpeed * Time.fixedDeltaTime;
 
     }
     private Vector3 CollisionSlopeCheck(Vector3 dir)
@@ -173,14 +189,11 @@ public class MyCharacterController : MonoBehaviour
     private void Gravity()
     {
         Vector3 boxSize = new Vector3(minWidth / 2, 0.1f, minWidth / 2);
-        Vector3 boxPos = new Vector3(transform.position.x, transform.position.y - maxHeight / 2 - boxSize.y / 2, transform.position.z);
+        Vector3 boxPos = new Vector3(transform.position.x, transform.position.y - maxHeight / 2 + boxSize.y / 2, transform.position.z);
 
         grounded = Physics.CheckBox(boxPos, boxSize,transform.rotation,discludePlayer);
-        if (grounded)
-            curGrav = 0;
-        else
-            curGrav = -gravity;
-        if (grounded)
+        
+        if (grounded && jumpVelocity < 0)
         {
             Ray ray = new Ray(transform.position, Vector3.down * 2);
             RaycastHit hit;
@@ -192,39 +205,32 @@ public class MyCharacterController : MonoBehaviour
                     Vector3 needed = new Vector3(transform.position.x, hit.point.y + maxHeight / 2, transform.position.z);
                     transform.position = needed;
                 }
-                else if (hit.distance > 2f)
-                {
-                    curGrav = -gravity;
-                }
             }
+            jumpAcceleration = 0;
+            jumpVelocity = 0;
+            jumpHeight = 0;
+            curGrav = 0;
         }
     }
 
     //WIP
     private void Jump()
     {
-        if(grounded)
+        jumpAcceleration = (jumpForce / mass) - curGrav;
+        jumpVelocity += jumpAcceleration * Time.fixedDeltaTime;
+        jumpHeight = jumpVelocity * Time.fixedDeltaTime + (jumpForce/mass) * Time.fixedDeltaTime * 2;
+        moveVector.y = jumpHeight;
+        if(jumpForce>0)
         {
-            if (jumpHeight > 0)
-                jumpHeight = 0;
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                jumpHeight += jumpForce;
-            }
-        }
-        else
-        {
-            if (jumpHeight > 0)
-            {
-                jumpHeight -= (jumpHeight * jumpDecrease * Time.deltaTime);
-            }
-            else
-            {
-                jumpHeight = 0;
-            }
+            jumpForce -= 1;
         }
     }
-    
+    //private void ResetJumpForce()
+    //{
+    //    jumpForce = 0;
+    //}
+
+
 
 
 }

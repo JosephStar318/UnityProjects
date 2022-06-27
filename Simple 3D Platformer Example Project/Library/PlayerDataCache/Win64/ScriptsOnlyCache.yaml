@@ -170,8 +170,6 @@ ScriptsOnlyBuild:
       Script: {instanceID: 0}
     - Class: 81
       Script: {instanceID: 0}
-    - Class: 89
-      Script: {instanceID: 0}
     - Class: 104
       Script: {instanceID: 0}
     - Class: 108
@@ -1065,7 +1063,7 @@ ScriptsOnlyBuild:
     className: UnityOnScrollRectValueChangedMessageListener
   - hash:
       serializedVersion: 2
-      Hash: 7365848a837dd7855c3d19015432fce2
+      Hash: 19da7af2c8d8b21f92edb6757987106f
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: MyCharacterController
@@ -1229,4 +1227,5 @@ ScriptsOnlyBuild:
   scenePathNames:
   - Assets/Scenes/Main Menu.unity
   - Assets/Scenes/Level 1.unity
-  playerPath: D:/Desktop/Unity Projects/3d test project/Build/3d test project.exe
+  playerPath: D:/Git-fork/UnityProjects/Simple 3D Platformer Example Project/Build/Simple
+    3D Platformer Example Project.exe
