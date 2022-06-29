@@ -18,12 +18,14 @@ public class MovingPlatformScript : MonoBehaviour
     public MoveStyle moveStyle;
     public float moveDistance;
     public float rotationRadius;
+    private float rotationAngle;
     public bool loopMovement;
     private int direction = 1;
     private Vector3 moveVector;
     private Vector3 startPosition;
     private Vector3 rotationOrigin;
     private Vector3 rotationDirection;
+    private Vector3 previousPosition;
     private GameObject player;
     // Start is called before the first frame update
     void Start()
@@ -50,11 +52,11 @@ public class MovingPlatformScript : MonoBehaviour
         }
         else if (moveStyle == MoveStyle.Circle)
         {
-            rotationOrigin = transform.TransformPoint(new Vector3(0, rotationRadius, 0));
-            //rotationDirection = 
-            moveVector = rotationDirection * moveSpeed * direction * Time.fixedDeltaTime;
-            transform.position += moveVector;
-            //moveVector = 
+            rotationAngle += moveSpeed * Time.fixedDeltaTime;
+
+            moveVector = new Vector3(Mathf.Sin(rotationAngle), Mathf.Cos(rotationAngle)) * rotationRadius;
+            previousPosition = transform.position;
+            transform.position = startPosition + moveVector;
         }
     }
 
@@ -62,9 +64,17 @@ public class MovingPlatformScript : MonoBehaviour
     {
         if (Physics.CheckBox(transform.position, transform.localScale * 0.8f, transform.rotation, LayerMask.GetMask("Player")))
         {
-            player.transform.position += moveVector;
-            player.transform.position.Set(player.transform.position.x, transform.position.y + 1, player.transform.position.z);
-            //todo get height of the player somehow
+            if(moveStyle == MoveStyle.Lineer)
+            {
+                player.transform.position += moveVector;
+                player.transform.position.Set(player.transform.position.x, transform.position.y + player.GetComponent<MyCharacterController>().maxHeight, player.transform.position.z);
+                //todo get height of the player somehow
+            }
+            else if (moveStyle == MoveStyle.Circle)
+            {
+                player.transform.position += transform.position - previousPosition;
+            }
+
         }
     }
 }

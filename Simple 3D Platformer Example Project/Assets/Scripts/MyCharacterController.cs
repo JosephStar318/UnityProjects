@@ -42,7 +42,7 @@ public class MyCharacterController : MonoBehaviour
     public float slopeClimbSpeed;
     public float slopeDecendSpeed;
 
-    private bool grounded;
+    public bool grounded;
     private float horizontalAxis;
     private float vertiaclAxis;
     private float xMouseAxis;

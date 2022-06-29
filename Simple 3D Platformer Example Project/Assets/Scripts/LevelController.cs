@@ -16,17 +16,23 @@ public class LevelController : MonoBehaviour
     private int stageLevel = 1;
     private bool isGameWin = false;
     public static bool isPaused = false;
+    private bool isAudioPlaying = false;
+    private MyCharacterController playerController;
     [SerializeField] public GameObject pauseMenu;
     [SerializeField] public GameObject checkpointNotification;
     [SerializeField] public Light checkpointLight;
+    [SerializeField] public AudioSource fallingAudio;
+    [SerializeField] public AudioSource fallHitAudio;
+
     // Start is called before the first frame update
     public void Start()
     {
+        playerController = player.GetComponent<MyCharacterController>();
         navigationManager.AddWayPoint("Start", player.transform.position);
         navigationManager.AddWayPoint("Stage1", new Vector3(0.19f, 1.5f, 23.33f));
         navigationManager.AddWayPoint("Stage2", new Vector3(20.75f, 7.4f ,20.87f));
         navigationManager.AddWayPoint("Stage3", new Vector3(20.32f, 16.07f, -3.77f));
-        //navigationManager.AddWayPoint("Stage4", new Vector3(20.32f, 16.07f, -3.77f));
+        navigationManager.AddWayPoint("Stage4", new Vector3(20.48f, 19.61f, -38.45f));
         activeCheckPoint = "Start";
         nextCheckPoint = "Stage" + stageLevel++;
         checkpointLight.transform.position = navigationManager.GetWaypointLocation(nextCheckPoint) + new Vector3(0,10,0);
@@ -54,7 +60,7 @@ public class LevelController : MonoBehaviour
             if(!isPaused)
             {
                 Time.timeScale = 0f;
-                player.GetComponent<MyCharacterController>().enabled = false;
+                playerController.enabled = false;
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
                 pauseMenu.SetActive(true);
@@ -63,7 +69,7 @@ public class LevelController : MonoBehaviour
             else
             {
                 Time.timeScale = 1f;
-                player.GetComponent<MyCharacterController>().enabled = true;
+                playerController.enabled = true;
                 Cursor.lockState = CursorLockMode.Confined;
                 Cursor.visible = false;
                 pauseMenu.SetActive(false);
@@ -75,8 +81,28 @@ public class LevelController : MonoBehaviour
     }
     private void FallDetect()
     {
+        if (!isAudioPlaying && (playerController.jumpVelocity < -6))
+        {
+            fallingAudio.Play(0);
+            isAudioPlaying = true;
+
+        }
+        else if (isAudioPlaying)
+        {
+            if (playerController.grounded == true)
+            {
+                fallingAudio.Stop();
+                isAudioPlaying = false;
+                //fallHitAudio.volume = Mathf
+
+                fallHitAudio.Play(0);
+            }
+        }
+       
         if (player.transform.position.y < fallHeightLimit)
         {
+            fallingAudio.Stop();
+            playerController.jumpVelocity = 0;
             navigationManager.Teleport(player, activeCheckPoint);
         }
     }
@@ -93,7 +119,7 @@ public class LevelController : MonoBehaviour
             ShowNotification();
             
             Debug.Log("Waypoint set");
-            if (nextCheckPoint == "Stage4")
+            if (nextCheckPoint == "Stage5")
             {
                 isGameWin = true;
             }

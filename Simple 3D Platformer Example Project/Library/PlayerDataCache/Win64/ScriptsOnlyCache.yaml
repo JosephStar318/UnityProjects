@@ -4,7 +4,9 @@ ScriptsOnlyBuild:
     - ButtonManager
     - LevelController
     - MainMenu
+    - MovingPlatformScript
     - MyCharacterController
+    - TextUI
     Unity.Rider.Editor.dll:
     - Packages.Rider.Editor.UnitTesting.CallbackData
     Unity.TextMeshPro.dll:
@@ -103,6 +105,10 @@ ScriptsOnlyBuild:
       Script: {instanceID: 0}
     - Class: 81
       Script: {instanceID: 0}
+    - Class: 82
+      Script: {instanceID: 0}
+    - Class: 83
+      Script: {instanceID: 0}
     - Class: 89
       Script: {instanceID: 0}
     - Class: 104
@@ -116,25 +122,29 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 1688}
     - Class: 114
-      Script: {instanceID: 2650}
+      Script: {instanceID: 2494}
     - Class: 114
-      Script: {instanceID: 2878}
+      Script: {instanceID: 2652}
     - Class: 114
-      Script: {instanceID: 3182}
+      Script: {instanceID: 2880}
     - Class: 114
-      Script: {instanceID: 5226}
+      Script: {instanceID: 3184}
     - Class: 114
-      Script: {instanceID: 5308}
+      Script: {instanceID: 5228}
     - Class: 114
-      Script: {instanceID: 5922}
+      Script: {instanceID: 5270}
     - Class: 114
-      Script: {instanceID: 6078}
+      Script: {instanceID: 5312}
     - Class: 114
-      Script: {instanceID: 6424}
+      Script: {instanceID: 5926}
     - Class: 114
-      Script: {instanceID: 6862}
+      Script: {instanceID: 6082}
     - Class: 114
-      Script: {instanceID: 7166}
+      Script: {instanceID: 6428}
+    - Class: 114
+      Script: {instanceID: 6866}
+    - Class: 114
+      Script: {instanceID: 7170}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -181,29 +191,29 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 2214}
     - Class: 114
-      Script: {instanceID: 2650}
+      Script: {instanceID: 2652}
     - Class: 114
-      Script: {instanceID: 2878}
+      Script: {instanceID: 2880}
     - Class: 114
-      Script: {instanceID: 3016}
+      Script: {instanceID: 3018}
     - Class: 114
-      Script: {instanceID: 3182}
+      Script: {instanceID: 3184}
     - Class: 114
-      Script: {instanceID: 4144}
+      Script: {instanceID: 4146}
     - Class: 114
-      Script: {instanceID: 4256}
+      Script: {instanceID: 4258}
     - Class: 114
-      Script: {instanceID: 4526}
+      Script: {instanceID: 4528}
     - Class: 114
-      Script: {instanceID: 5308}
+      Script: {instanceID: 5312}
     - Class: 114
-      Script: {instanceID: 5922}
+      Script: {instanceID: 5926}
     - Class: 114
-      Script: {instanceID: 6078}
+      Script: {instanceID: 6082}
     - Class: 114
-      Script: {instanceID: 6424}
+      Script: {instanceID: 6428}
     - Class: 114
-      Script: {instanceID: 6862}
+      Script: {instanceID: 6866}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -235,7 +245,7 @@ ScriptsOnlyBuild:
     className: PanelRaycaster
   - hash:
       serializedVersion: 2
-      Hash: f57f826063c97b45a1e676b83b0fb309
+      Hash: 28ed516f56001d73c06b684ed2b17f22
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: LevelController
@@ -341,6 +351,12 @@ ScriptsOnlyBuild:
     assemblyName: UnityEngine.UI.dll
     namespaceName: UnityEngine.UI
     className: RawImage
+  - hash:
+      serializedVersion: 2
+      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: TextUI
   - hash:
       serializedVersion: 2
       Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
@@ -835,6 +851,12 @@ ScriptsOnlyBuild:
     className: UnityOnCollisionEnter2DMessageListener
   - hash:
       serializedVersion: 2
+      Hash: 35acd6d65eb5a595ee0d1c71bbf6350f
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: MovingPlatformScript
+  - hash:
+      serializedVersion: 2
       Hash: e6f0efd0e20669d577e9d21526b3d3f9
     assemblyName: Assembly-CSharp.dll
     namespaceName: TMPro.Examples
@@ -1063,7 +1085,7 @@ ScriptsOnlyBuild:
     className: UnityOnScrollRectValueChangedMessageListener
   - hash:
       serializedVersion: 2
-      Hash: ba0524ecfbc5a527a450cbf05c6637f3
+      Hash: 8786d211a561997813a3b5f19e4e5dc4
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: MyCharacterController

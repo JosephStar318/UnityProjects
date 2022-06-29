@@ -306,13 +306,13 @@
       "DebugActionIndex": 13
     },
     {
-      "Annotation": "CopyFiles Build/Simple 3D Platformer Example Project_Data/sharedassets1.assets.resS",
+      "Annotation": "CopyFiles Build/Simple 3D Platformer Example Project_Data/sharedassets1.resource",
       "ActionType": "CopyFiles",
       "Inputs": [
-        "Library/PlayerDataCache/Win64/Data/sharedassets1.assets.resS"
+        "Library/PlayerDataCache/Win64/Data/sharedassets1.resource"
       ],
       "Outputs": [
-        "Build/Simple 3D Platformer Example Project_Data/sharedassets1.assets.resS"
+        "Build/Simple 3D Platformer Example Project_Data/sharedassets1.resource"
       ],
       "DebugActionIndex": 14
     },

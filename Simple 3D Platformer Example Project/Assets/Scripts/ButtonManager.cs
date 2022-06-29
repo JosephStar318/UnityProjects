@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEditor;
+using UnityEngine.UI;
 public class ButtonManager : MonoBehaviour
 {
     public void ChangeScene(string sceneName)
@@ -29,5 +30,9 @@ public class ButtonManager : MonoBehaviour
         Cursor.visible = false;
         LevelController.isPaused = false;
 
+    }
+    public void ChangeFOV(Camera camera)
+    {
+        camera.fieldOfView = GameObject.Find("FOVBar").GetComponent<Slider>().value;
     }
 }
