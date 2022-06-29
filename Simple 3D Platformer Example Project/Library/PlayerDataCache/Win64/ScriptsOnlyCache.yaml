@@ -1063,7 +1063,7 @@ ScriptsOnlyBuild:
     className: UnityOnScrollRectValueChangedMessageListener
   - hash:
       serializedVersion: 2
-      Hash: 19da7af2c8d8b21f92edb6757987106f
+      Hash: ba0524ecfbc5a527a450cbf05c6637f3
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: MyCharacterController

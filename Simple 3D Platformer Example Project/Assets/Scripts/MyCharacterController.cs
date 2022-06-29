@@ -28,6 +28,12 @@ public class MyCharacterController : MonoBehaviour
     [Header("External")]
     public Camera playerCamera;
     public float mouseSensivity;
+    public enum CameraMode
+    {
+        FPS = 0,
+        TPS = 1
+    }
+    public CameraMode cameraMode;
     public LayerMask discludePlayer;
 
     [Header("Surface Control")]
@@ -43,6 +49,11 @@ public class MyCharacterController : MonoBehaviour
     private float yMouseAxis;
 
     #endregion
+
+    private void Start()
+    {
+
+    }
     private void Update()
     {
         GetUserInput();
@@ -71,9 +82,20 @@ public class MyCharacterController : MonoBehaviour
     private Vector3 moveVector;
     private Vector3 currentRotation;
     private float maxYAngle = 80;
-    private float jumpTimeStart;
     private void GetUserInput()
     {
+        if(Input.GetKeyDown(KeyCode.F5))
+        {
+            if(cameraMode == CameraMode.FPS)
+            {
+                cameraMode = CameraMode.TPS;
+            }
+            else
+            {
+                cameraMode = CameraMode.FPS;
+            }
+        }
+        if (Input.GetMouseButtonDown(0)) Cursor.lockState = CursorLockMode.Locked;
         horizontalAxis = Input.GetAxis("Horizontal");
         vertiaclAxis = Input.GetAxis("Vertical");
         xMouseAxis = Input.GetAxis("Mouse X");
@@ -82,7 +104,7 @@ public class MyCharacterController : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                jumpForce = 75;
+                jumpForce = 50;
                 curGrav = gravity;
             }
         }
@@ -114,14 +136,20 @@ public class MyCharacterController : MonoBehaviour
         currentRotation.y = Mathf.Clamp(currentRotation.y, -maxYAngle, maxYAngle);
         playerCamera.transform.rotation = Quaternion.Euler(currentRotation.y, currentRotation.x, 0);
         transform.rotation = Quaternion.Euler(0, currentRotation.x, 0);
-        if (Input.GetMouseButtonDown(0))
-            Cursor.lockState = CursorLockMode.Locked;
-
-        //playerCamera.transform.position = transform.position;
-        Vector3 p = transform.rotation * new Vector3(0,4,-4);
-        playerCamera.transform.position = transform.position + p;
+        
+        if(cameraMode == CameraMode.TPS)
+        {
+            Vector3 p = transform.rotation * new Vector3(0, 4, -4);
+            playerCamera.transform.position = transform.position + p;
+        }
+        else if(cameraMode == CameraMode.FPS)
+        {
+            playerCamera.transform.position = transform.position;
+        }
+        
         
     }
+   
     private void FinalMovement()
     {
         Debug.DrawRay(transform.position, transform.forward, Color.red,0.2f);
@@ -209,6 +237,7 @@ public class MyCharacterController : MonoBehaviour
             jumpAcceleration = 0;
             jumpVelocity = 0;
             jumpHeight = 0;
+            moveVector.y = 0;
             curGrav = 0;
         }
     }

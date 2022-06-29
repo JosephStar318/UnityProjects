@@ -17,18 +17,19 @@ public class LevelController : MonoBehaviour
     private bool isGameWin = false;
     public static bool isPaused = false;
     [SerializeField] public GameObject pauseMenu;
+    [SerializeField] public GameObject checkpointNotification;
+    [SerializeField] public Light checkpointLight;
     // Start is called before the first frame update
     public void Start()
     {
         navigationManager.AddWayPoint("Start", player.transform.position);
-        navigationManager.AddWayPoint("Stage1", new Vector3(0.3138357f, 1.5f, 22.97127f));
-        //navigationManager.AddWayPoint("Stage1", player.transform.position);
-        //navigationManager.AddWayPoint("Stage2", player.transform.position);
-        //navigationManager.AddWayPoint("Stage3", player.transform.position);
-        //navigationManager.AddWayPoint("Stage4", player.transform.position);
+        navigationManager.AddWayPoint("Stage1", new Vector3(0.19f, 1.5f, 23.33f));
+        navigationManager.AddWayPoint("Stage2", new Vector3(20.75f, 7.4f ,20.87f));
+        navigationManager.AddWayPoint("Stage3", new Vector3(20.32f, 16.07f, -3.77f));
+        //navigationManager.AddWayPoint("Stage4", new Vector3(20.32f, 16.07f, -3.77f));
         activeCheckPoint = "Start";
         nextCheckPoint = "Stage" + stageLevel++;
-
+        checkpointLight.transform.position = navigationManager.GetWaypointLocation(nextCheckPoint) + new Vector3(0,10,0);
         Cursor.visible = false;
     }
     
@@ -82,18 +83,34 @@ public class LevelController : MonoBehaviour
     private void CheckPointCheck()
     {
         Vector3 waypointPosition = navigationManager.GetWaypointLocation(nextCheckPoint);
-        Vector3 boxSize = new Vector3(5, 5, 5);
+        Vector3 boxSize = new Vector3(2, 2, 2);
         
         if (Physics.CheckBox(waypointPosition,boxSize,transform.rotation,LayerMask.GetMask("Player")) == true)
         {
+            
             activeCheckPoint = nextCheckPoint;
             nextCheckPoint = "Stage" + stageLevel++;
+            ShowNotification();
+            
             Debug.Log("Waypoint set");
             if (nextCheckPoint == "Stage4")
             {
                 isGameWin = true;
             }
+            else
+            {
+                checkpointLight.transform.position = navigationManager.GetWaypointLocation(nextCheckPoint) + new Vector3(0, 10, 0);
+            }
         }
         
+    }
+    private void ShowNotification()
+    {
+        checkpointNotification.SetActive(true);
+        Invoke(nameof(HideNotification), 5);
+    }
+    private void HideNotification()
+    {
+        checkpointNotification.SetActive(false);
     }
 }
