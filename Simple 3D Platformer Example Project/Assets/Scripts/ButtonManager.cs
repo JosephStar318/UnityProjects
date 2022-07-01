@@ -34,5 +34,6 @@ public class ButtonManager : MonoBehaviour
     public void ChangeFOV(Camera camera)
     {
         camera.fieldOfView = GameObject.Find("FOVBar").GetComponent<Slider>().value;
+        GameObject.Find("Player").GetComponent<MyCharacterController>().defaultFOV = camera.fieldOfView;
     }
 }

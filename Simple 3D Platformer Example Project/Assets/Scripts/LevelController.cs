@@ -23,6 +23,7 @@ public class LevelController : MonoBehaviour
     [SerializeField] public Light checkpointLight;
     [SerializeField] public AudioSource fallingAudio;
     [SerializeField] public AudioSource fallHitAudio;
+    [SerializeField] public ParticleSystem fallParticles;
 
     // Start is called before the first frame update
     public void Start()
@@ -94,7 +95,8 @@ public class LevelController : MonoBehaviour
                 fallingAudio.Stop();
                 isAudioPlaying = false;
                 //fallHitAudio.volume = Mathf
-
+                fallParticles.transform.position = playerController.transform.position - new Vector3(0,playerController.maxHeight/2,0);
+                fallParticles.Play();
                 fallHitAudio.Play(0);
             }
         }
