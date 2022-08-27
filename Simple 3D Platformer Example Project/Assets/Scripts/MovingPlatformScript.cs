@@ -17,8 +17,8 @@ public class MovingPlatformScript : MonoBehaviour
     }
     public MoveStyle moveStyle;
     public float moveDistance;
-    public float rotationRadius;
     private float rotationAngle;
+    public float rotationRadius;
     public bool loopMovement;
     private int direction = 1;
     private Vector3 moveVector;
@@ -31,7 +31,7 @@ public class MovingPlatformScript : MonoBehaviour
     void Start()
     {
         startPosition = transform.position;
-        player = GameObject.Find("Player");
+        player = GameObject.FindGameObjectWithTag("Player");
     }
 
     private void FixedUpdate()

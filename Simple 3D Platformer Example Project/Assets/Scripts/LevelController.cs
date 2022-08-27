@@ -16,14 +16,10 @@ public class LevelController : MonoBehaviour
     private int stageLevel = 1;
     private bool isGameWin = false;
     public static bool isPaused = false;
-    private bool isAudioPlaying = false;
     private MyCharacterController playerController;
     [SerializeField] public GameObject pauseMenu;
     [SerializeField] public GameObject checkpointNotification;
     [SerializeField] public Light checkpointLight;
-    [SerializeField] public AudioSource fallingAudio;
-    [SerializeField] public AudioSource fallHitAudio;
-    [SerializeField] public ParticleSystem fallParticles;
 
     // Start is called before the first frame update
     public void Start()
@@ -82,29 +78,8 @@ public class LevelController : MonoBehaviour
     }
     private void FallDetect()
     {
-        if (!isAudioPlaying && (playerController.jumpVelocity < -6))
+        if(player.transform.position.y < fallHeightLimit)
         {
-            fallingAudio.Play(0);
-            isAudioPlaying = true;
-
-        }
-        else if (isAudioPlaying)
-        {
-            if (playerController.grounded == true)
-            {
-                fallingAudio.Stop();
-                isAudioPlaying = false;
-                //fallHitAudio.volume = Mathf
-                fallParticles.transform.position = playerController.transform.position - new Vector3(0,playerController.maxHeight/2,0);
-                fallParticles.Play();
-                fallHitAudio.Play(0);
-            }
-        }
-       
-        if (player.transform.position.y < fallHeightLimit)
-        {
-            fallingAudio.Stop();
-            playerController.jumpVelocity = 0;
             navigationManager.Teleport(player, activeCheckPoint);
         }
     }

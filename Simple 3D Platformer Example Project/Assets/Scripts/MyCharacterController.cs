@@ -6,6 +6,11 @@ using UnityEngine;
 public class MyCharacterController : MonoBehaviour
 {
     #region Variables
+    
+    [Header("Object Dimensions")]
+    public float maxHeight;
+    public float minWidth;
+
     [Header("Speeds")]
     private float moveSpeed;
     public float walkSpeed;
@@ -38,13 +43,10 @@ public class MyCharacterController : MonoBehaviour
     private float curCoeffX;
     private float curCoeffZ;
 
-    [Header("Object Dimensions")]
-    public float maxHeight;
-    public float minWidth;
-
     [Header("External")]
     public Camera playerCamera;
     public float mouseSensivity;
+
     public enum CameraMode
     {
         FPS = 0,
@@ -72,34 +74,112 @@ public class MyCharacterController : MonoBehaviour
     private float maxYAngle = 80;
     private bool isRunning = false;
     internal float defaultFOV;
+
+    private Vector3 dashDestination;
+    private bool isDashing = false;
+    private int dashCooldownCounter = 0;
+    private Animator animator;
+    [Header("Sounds & Effects")]
+    [SerializeField] public AudioSource fallingAudio;
+    [SerializeField] public AudioSource fallHitAudio;
+    [SerializeField] public AudioSource dashAudio;
+    [SerializeField] public AudioSource walkingAudio;
+    [SerializeField] public AudioSource runningAudio;
+
+    [SerializeField] public ParticleSystem fallParticles;
+
     #endregion
 
     private void Start()
     {
         moveSpeed = walkSpeed;
         defaultFOV = playerCamera.fieldOfView;
+        animator = GetComponent<Animator>();
 
     }
     private void Update()
     {
         GetUserInput();
+        PlayerEffectsHandler();
         MovementFOV();
         Jump();
     }
-    private float lerp(float a, float b, float f)
+
+    private void Dash()
     {
-        return a + f * (b - a);
+        if(isDashing)
+        {
+            //play dash sound
+
+            transform.position = Vector3.Lerp(transform.position, dashDestination, Time.fixedDeltaTime);
+            playerCamera.transform.position = Vector3.Lerp(playerCamera.transform.position, dashDestination, Time.fixedDeltaTime);
+            if(dashCooldownCounter < 50*4.5f)
+            {
+                isDashing = false;
+            }
+        }
+        dashCooldownCounter--;
     }
+
+    private void PlayerEffectsHandler()
+    {
+        if (!fallingAudio.isPlaying && (jumpVelocity < -6))
+        {
+            fallingAudio.Play(0);
+        }
+        else if (fallingAudio.isPlaying)
+        {
+            if (grounded == true)
+            {
+                fallingAudio.Stop();
+                //fallHitAudio.volume = Mathf
+                fallParticles.transform.position = transform.position - new Vector3(0, maxHeight / 2 - 0.5f, 0);
+                fallParticles.Play();
+                fallHitAudio.Play(0);
+            }
+        }
+        if(moveVector.magnitude != 0 && grounded)
+        {
+            if (isRunning && !runningAudio.isPlaying)
+            {
+                animator.SetBool("isRunning", true);
+                animator.SetBool("isWalking", false);
+                animator.SetBool("isIdleing", false);
+                if ((Mathf.Abs(velocityZ) > 0.5f || Mathf.Abs(velocityX) > 0.5f))
+                {
+                    walkingAudio.Stop();
+                    runningAudio.Play();
+                }
+            }
+            else if (!isRunning && !walkingAudio.isPlaying)
+            {
+                animator.SetBool("isWalking", true);
+                animator.SetBool("isRunning", false);
+                animator.SetBool("isIdleing", false);
+                if ((Mathf.Abs(velocityZ) > 0.5f || Mathf.Abs(velocityX) > 0.5f))
+                {
+                    runningAudio.Stop();
+                    walkingAudio.Play();
+                }
+            }
+        }
+        else
+        {
+            GetComponent<Animator>().SetBool("isWalking", false);
+            GetComponent<Animator>().SetBool("isRunning", false);
+            GetComponent<Animator>().SetBool("isIdleing", true);
+            walkingAudio.Stop();
+            runningAudio.Stop();
+        }
+        
+    }
+
     private void MovementFOV()
     {
         if (isRunning && (horizontalMove.z != 0))
         {
             playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, defaultFOV + 20, 0.2f);
-            
-            Debug.Log(defaultFOV);
-            Debug.Log(playerCamera.fieldOfView);
         }
-
     }
 
     public void FixedUpdate()
@@ -108,6 +188,7 @@ public class MyCharacterController : MonoBehaviour
         MouseLook();
         FinalMovement();
         SimpleMove();
+        Dash();
     }
     private void OnDrawGizmos()
     {
@@ -122,6 +203,7 @@ public class MyCharacterController : MonoBehaviour
         Vector3 l = transform.TransformPoint(sensorLocal);
         Gizmos.DrawSphere(l, 0.2f);
     }
+
 
     private void GetUserInput()
     {
@@ -138,21 +220,36 @@ public class MyCharacterController : MonoBehaviour
         }
         if(Input.GetKey(KeyCode.LeftShift))
         {
-            Debug.Log(isRunning);
             moveSpeed = sprintSpeed;
             isRunning = true;
         }
+        if(Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            if(dashCooldownCounter <= 0)
+            {
+                Vector3 dashMovement = transform.TransformDirection(new Vector3(moveVector.x, 0, moveVector.z));
+                dashDestination = transform.position + dashMovement*100;
+                dashAudio.Play();
+                isDashing = true;
+                dashCooldownCounter = 50 * 5;
+                Debug.Log(dashMovement);
+            }
+        }
         if (Input.GetMouseButtonDown(0)) Cursor.lockState = CursorLockMode.Locked;
+
         horizontalAxis = Input.GetAxis("Horizontal");
         verticalAxis = Input.GetAxis("Vertical");
         xMouseAxis = Input.GetAxis("Mouse X");
         yMouseAxis = Input.GetAxis("Mouse Y");
+        
         if (grounded)
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 jumpForce = 50;
                 curGrav = gravity;
+                animator.SetBool("isGrounded", false);
+                animator.SetBool("isJumping", true);
             }
         }
         else
@@ -164,20 +261,21 @@ public class MyCharacterController : MonoBehaviour
     {
         if (cameraMode == CameraMode.TPS)
         {
-            /*For TPS or FPS camera*/
+            /*For TPS camera*/
             currentRotation.x += xMouseAxis * mouseSensivity;
             currentRotation.y -= yMouseAxis * mouseSensivity;
             currentRotation.x = Mathf.Repeat(currentRotation.x, 360);
             currentRotation.y = Mathf.Clamp(currentRotation.y, -maxYAngle, maxYAngle);
-            playerCamera.transform.rotation = Quaternion.Euler(currentRotation.y, currentRotation.x, 0);
-            transform.rotation = Quaternion.Euler(0, currentRotation.x, 0);
 
-            Vector3 p = transform.rotation * new Vector3(0, 4, -4);
+            playerCamera.transform.rotation = Quaternion.Euler(currentRotation.y, currentRotation.x, 0);
+            //transform.rotation = Quaternion.Euler(0, currentRotation.x, 0);
+
+            Vector3 p = playerCamera.transform.rotation * new Vector3(0,2, -8);
             playerCamera.transform.position = transform.position + p;
         }
         else if (cameraMode == CameraMode.FPS)
         {
-            /*For TPS or FPS camera*/
+            /*For FPS camera*/
             currentRotation.x += xMouseAxis * mouseSensivity;
             currentRotation.y -= yMouseAxis * mouseSensivity;
             currentRotation.x = Mathf.Repeat(currentRotation.x, 360);
@@ -185,7 +283,8 @@ public class MyCharacterController : MonoBehaviour
             playerCamera.transform.rotation = Quaternion.Euler(currentRotation.y, currentRotation.x, 0);
             transform.rotation = Quaternion.Euler(0, currentRotation.x, 0);
 
-            playerCamera.transform.position = transform.position;
+            Vector3 p = transform.rotation * new Vector3(0, maxHeight*0.8f, 0.5f);
+            playerCamera.transform.position = transform.position + p;
         }
         else if(cameraMode == CameraMode.ISO)
         {
@@ -206,7 +305,7 @@ public class MyCharacterController : MonoBehaviour
 
     private void FinalMovement()
     {
-        Debug.DrawRay(transform.position, transform.forward, Color.red,0.2f);
+        Debug.DrawRay(transform.position, transform.forward, Color.red, 0.2f);
         Vector3 movement = new Vector3(moveVector.x, moveVector.y, moveVector.z);
         movement = transform.TransformDirection(movement);
         transform.position += movement;
@@ -214,12 +313,23 @@ public class MyCharacterController : MonoBehaviour
     private void SimpleMove()
     {
         HorizontalPhysics();
-
         moveVector = CollisionSlopeCheck(new Vector3(horizontalMove.x, 0, horizontalMove.z) * axisSpeed) * moveSpeed * Time.fixedDeltaTime;
+
+
+
+        //For walking down stairs
+        Ray ray = new Ray(transform.position, Vector3.down);
+        RaycastHit hit;
+        if(Physics.Raycast(ray,out hit,maxHeight,discludePlayer))
+        {
+            if(hit.distance > maxHeight*0.5f)
+            transform.position -= new Vector3(0, 0.01f, 0);
+        }
     }
 
     private void HorizontalPhysics()
     {
+        //horizontal and vertical axis is between -1 to 1. because of that there is a need for condition to calculate the movement
         if(horizontalAxis >= 0)
         {
             accelerationX = (horizontalAxis * 1000 - curCoeffX) * Time.fixedDeltaTime;
@@ -247,8 +357,10 @@ public class MyCharacterController : MonoBehaviour
 
         if (grounded)
         {
+
             curCoeffX = groundFractionCoeff;
             curCoeffZ = groundFractionCoeff;
+            //if there is no movement input from user make the player stop
             if (horizontalAxis != 0)
             {
                 horizontalMove.x = velocityX * Time.fixedDeltaTime * 6;
@@ -268,6 +380,7 @@ public class MyCharacterController : MonoBehaviour
         }
         else
         {
+            //if the player is on air slow down the player with air fraction and make the player lose its momentum
             if(horizontalAxis != 0)
             {
                 curCoeffX = airFractionCoeff;
@@ -288,6 +401,8 @@ public class MyCharacterController : MonoBehaviour
         }
         if (horizontalMove.z == 0)
         {
+            //looking direction is parallel with the z component of the input movement vector
+            //so the running property is effected in the movement direction
             isRunning = false;
             moveSpeed = walkSpeed;
             playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, defaultFOV, 0.2f);
@@ -309,7 +424,7 @@ public class MyCharacterController : MonoBehaviour
             Vector3 heading = hit.point - transform.position;
             Vector3 projectVector = Vector3.Project(heading, hit.normal);
             Debug.DrawRay(transform.position, projectVector, Color.blue, 0.2f);
-            if (projectVector.magnitude <= minWidth / 2)
+            if (projectVector.magnitude <= minWidth * 0.6f)
             {
                 
                 //collision vector perpendicular to hit object in y axis
@@ -326,7 +441,8 @@ public class MyCharacterController : MonoBehaviour
                 //if there is an object on the movement direction based on the distance to the object move the player
                 if (wCheck.transform != null)
                 {
-                    dir2 *= wCheck.distance * 0.5f;
+                    if (wCheck.distance > minWidth * 0.6f) dir2 *= 0.5f;
+                    else dir2 *= 0;
                 }
                 transform.position += dir2;
                 return Vector3.zero; //no final movement
@@ -341,7 +457,7 @@ public class MyCharacterController : MonoBehaviour
         Vector3 l = transform.TransformPoint(sensorLocal);
         Ray ray = new Ray(l, dir);
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 0.2f, discludePlayer))
+        if (Physics.Raycast(ray, out hit, 2f, discludePlayer))
         {
             return hit;
         }
@@ -354,7 +470,7 @@ public class MyCharacterController : MonoBehaviour
         Vector3 boxPos = new Vector3(transform.position.x, transform.position.y - maxHeight / 2 + boxSize.y / 2, transform.position.z);
 
         grounded = Physics.CheckBox(boxPos, boxSize,transform.rotation,discludePlayer);
-        
+        animator.SetBool("isGrounded", grounded);
         if (grounded && jumpVelocity < 0)
         {
             Ray ray = new Ray(transform.position, Vector3.down * 2);
@@ -373,10 +489,10 @@ public class MyCharacterController : MonoBehaviour
             jumpHeight = 0;
             moveVector.y = 0;
             curGrav = 0;
+            animator.SetBool("isJumping", false);
         }
     }
 
-    //WIP
     private void Jump()
     {
         jumpAcceleration = (jumpForce / mass) - curGrav;

@@ -24,7 +24,7 @@ public class ButtonManager : MonoBehaviour
     public void UnPause()
     {
         Time.timeScale = 1f;
-        GameObject.Find("Player").GetComponent<MyCharacterController>().enabled = true;
+        GameObject.FindGameObjectWithTag("Player").GetComponent<MyCharacterController>().enabled = true;
         GameObject.Find("Pause Menu").SetActive(false);
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = false;
@@ -34,6 +34,6 @@ public class ButtonManager : MonoBehaviour
     public void ChangeFOV(Camera camera)
     {
         camera.fieldOfView = GameObject.Find("FOVBar").GetComponent<Slider>().value;
-        GameObject.Find("Player").GetComponent<MyCharacterController>().defaultFOV = camera.fieldOfView;
+        GameObject.FindGameObjectWithTag("Player").GetComponent<MyCharacterController>().defaultFOV = camera.fieldOfView;
     }
 }
