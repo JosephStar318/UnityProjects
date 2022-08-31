@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: 492055485231440556}
   - component: {fileID: 492055485231440557}
   - component: {fileID: 492055485231440558}
-  - component: {fileID: 4315096692389204658}
+  - component: {fileID: -6789063326882739101}
   m_Layer: 0
   m_Name: Red_Default
-  m_TagString: Untagged
+  m_TagString: Block
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -110,13 +110,13 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 492055485231440554}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 1ffb9030c3f1adc4c894027909d0cf6d, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 2.120794, y: 2.4661798, z: 2}
   m_Center: {x: -0.015792012, y: 0.022444248, z: 0.88699675}
---- !u!114 &4315096692389204658
+--- !u!114 &-6789063326882739101
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -125,6 +125,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 492055485231440554}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6730040f662d3be4cbac51adf4a05bc3, type: 3}
+  m_Script: {fileID: 11500000, guid: 545ef7620f6423348acb950dad251782, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blockType: 4
+  blockState: 0

@@ -683,37 +683,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2069303459}
-  - component: {fileID: 2069303458}
+  - component: {fileID: 2069303460}
   m_Layer: 0
-  m_Name: Block Spawn Manager
+  m_Name: Block Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2069303458
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2069303457}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cee132a4230ade4f97bf12254cc0b2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  blocks:
-  - {fileID: 8094449468982639249, guid: dfcdd27a10a5fc742b4acadb67569788, type: 3}
-  - {fileID: 4137363412531945865, guid: 3abef4f0d5730964c8af9c27caec4fbf, type: 3}
-  - {fileID: 4346571933986002533, guid: 1b5849552db00d3479546cd7bad9ae89, type: 3}
-  - {fileID: 2818886380477016734, guid: 935013f084b784244b1b4984060a89ca, type: 3}
-  - {fileID: 492055485231440554, guid: 1adf307e9db667546ad026e8bd81a2ad, type: 3}
-  - {fileID: 8072147740332601280, guid: 6f4fd2e508952734292991b4939ff05a, type: 3}
-  rows: 6
-  columns: 4
-  spawnOffsetX: 200
-  spawnOffsetY: 80
 --- !u!4 &2069303459
 Transform:
   m_ObjectHideFlags: 0
@@ -729,3 +706,26 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2069303460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2069303457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cee132a4230ade4f97bf12254cc0b2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefabBlocks:
+  - {fileID: 8094449468982639249, guid: dfcdd27a10a5fc742b4acadb67569788, type: 3}
+  - {fileID: 4137363412531945865, guid: 3abef4f0d5730964c8af9c27caec4fbf, type: 3}
+  - {fileID: 4346571933986002533, guid: 1b5849552db00d3479546cd7bad9ae89, type: 3}
+  - {fileID: 2818886380477016734, guid: 935013f084b784244b1b4984060a89ca, type: 3}
+  - {fileID: 492055485231440554, guid: 1adf307e9db667546ad026e8bd81a2ad, type: 3}
+  - {fileID: 8072147740332601280, guid: 6f4fd2e508952734292991b4939ff05a, type: 3}
+  rows: 6
+  columns: 4
+  spawnOffsetX: 200
+  spawnOffsetY: 80
