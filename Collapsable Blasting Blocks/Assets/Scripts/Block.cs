@@ -8,7 +8,6 @@ public class Block
     public BlockType blockType;
     public BlockState blockState;
     public GameObject block;
-    public int parentGroupID;
 
     public Block()
     {

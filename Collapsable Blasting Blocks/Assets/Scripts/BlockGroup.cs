@@ -16,7 +16,7 @@ public class BlockGroup
         { 
             groupID = value;
             //whenever group id set, each child's parentGroupID will be set as well
-            blocks.ForEach(item => item.parentGroupID = value);
+            blocks.ForEach(item => item.block.GetComponent<BlockComponent>().parentGroupID = value);
         }
     }
 }
