@@ -6,8 +6,23 @@ using UnityEngine;
 public class Block
 {
     public BlockType blockType;
-    public BlockState blockState;
+    private BlockState blockState;
     public GameObject block;
+
+    public BlockState BlockState 
+    {
+        get => blockState; 
+        set
+        {
+            if(BlockState == BlockState.First)
+            {
+                if(blockType == BlockType.Blue)
+                {
+                    //change sprite
+                }
+            }
+        } 
+    }
 
     public Block()
     {
@@ -16,7 +31,7 @@ public class Block
     public Block(BlockType blockType, BlockState blockState, GameObject block)
     {
         this.blockType = blockType;
-        this.blockState = blockState;
+        this.BlockState = blockState;
         this.block = block;
     }
 }

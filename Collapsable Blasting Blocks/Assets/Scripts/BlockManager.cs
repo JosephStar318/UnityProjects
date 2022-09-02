@@ -21,6 +21,7 @@ public class BlockManager : MonoBehaviour
     private int blockTypeCount;
     private float gapX;
     private float gapY;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -29,8 +30,10 @@ public class BlockManager : MonoBehaviour
         occurenceMatrix = new bool[rows, columns];
         SpawnBlocks();
         CheckGroups();
+
+        
     }
-    
+
     private void CheckGroups()
     {
         for (int i = 0; i < rows; i++)
@@ -44,9 +47,26 @@ public class BlockManager : MonoBehaviour
                     bg.blocks.Add(blockMatrix[i, j]);
                     bg.GroupID = groupIDCounter++;
                     BlockGroup.blockGroups.Add(bg);
+                    ChanceBlockState(bg);
 
                 }
             }
+        }
+    }
+
+    private void ChanceBlockState(BlockGroup bg)
+    {
+        if(bg.blocks.Count > 4)
+        {
+            bg.blocks.ForEach(block => block.BlockState = BlockState.First);
+        }
+        else if(bg.blocks.Count > 4 && bg.blocks.Count < 6)
+        {
+            bg.blocks.ForEach(block => block.BlockState = BlockState.Second);
+        }
+        else if (bg.blocks.Count > 6)
+        {
+            bg.blocks.ForEach(block => block.BlockState = BlockState.Third);
         }
     }
 
@@ -121,7 +141,6 @@ public class BlockManager : MonoBehaviour
                 randomType = Random.Range(0, blockTypeCount);
                 Vector3 spawnPos = new Vector3(spawnOffsetX + j * gapX, spawnOffsetY + i * gapY,-5);
                 GameObject instance = Instantiate(prefabBlocks[randomType], spawnPos, Quaternion.identity);
-
                 blockMatrix[i, j] = new Block(
                     prefabBlocks[randomType].GetComponent<BlockComponent>().blockType,
                     prefabBlocks[randomType].GetComponent<BlockComponent>().blockState,
@@ -131,23 +150,67 @@ public class BlockManager : MonoBehaviour
         }
 
     }
-    private void CollapseBlocks()
+    public void CollapseBlocks()
     {
-
+        //check if null spaces for each column from bottom to top
+        for (int j = 0; j < columns; j++)
+        {
+            int nullCount = 0;
+            for (int i = 0; i < rows*2; i++)
+            {
+                if (blockMatrix[i, j].block == null)
+                {
+                    nullCount++;
+                }
+                else
+                {
+                    if(nullCount>0)
+                    {
+                        //swap elements
+                        Block temp = blockMatrix[i-nullCount, j];
+                        blockMatrix[i- nullCount, j] = blockMatrix[i, j];
+                        blockMatrix[i, j] = temp;
+                    }
+                }
+            }
+        }
+        SpawnSpareBlocks();
+        BlockGroup.blockGroups.Clear();
+        System.Array.Clear(occurenceMatrix,0,occurenceMatrix.Length);
+        CheckGroups();
     }
 
     private void SpawnSpareBlocks()
     {
+        int randomType;
 
+        for (int i = rows; i < rows*2; i++)
+        {
+            for (int j = 0; j < columns; j++)
+            {
+                if(blockMatrix[i,j].block == null)
+                {
+                    randomType = Random.Range(0, blockTypeCount);
+                    Vector3 spawnPos = new Vector3(spawnOffsetX + j * gapX, spawnOffsetY + i * gapY, -5);
+                    GameObject instance = Instantiate(prefabBlocks[randomType], spawnPos, Quaternion.identity);
+                    blockMatrix[i, j] = new Block(
+                    prefabBlocks[randomType].GetComponent<BlockComponent>().blockType,
+                    prefabBlocks[randomType].GetComponent<BlockComponent>().blockState,
+                    instance
+                    );
+                }
+            }
+        }
     }
-
 
     // Update is called once per frame
     void Update()
     {
-        foreach (BlockGroup item in BlockGroup.blockGroups)
+        if (isBlasted)
         {
-            Debug.Log("\n Group: " + item.GroupID + " " + item.blocks.Count);
+            //make a delay to catch up with destroy metod
+            Invoke(nameof(CollapseBlocks), 2);
+            isBlasted = false;
         }
     }
 }

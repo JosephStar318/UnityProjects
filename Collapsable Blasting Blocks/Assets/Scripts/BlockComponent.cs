@@ -16,13 +16,19 @@ public class BlockComponent : MonoBehaviour
             //destroy blocks
             foreach (var item in BlockGroup.blockGroups)
             {
-                if (item.GroupID == parentGroupID)
+                if(item.blocks.Count > 1)
                 {
-                    item.blocks.ForEach(i => Destroy(i.block));
+                    if (item.GroupID == parentGroupID)
+                    {
+                        item.blocks.ForEach(i => Destroy(i.block));
+                    }
+                    BlockManager.instance.isBlasted = true;
                 }
+               
             }
-            BlockManager.instance.isBlasted = true;
+
             
+
         }
     }
 
