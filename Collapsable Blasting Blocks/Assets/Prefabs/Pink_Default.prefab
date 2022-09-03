@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4346571933986002535}
   - component: {fileID: 4346571933986002532}
   - component: {fileID: 7513188348223789042}
-  - component: {fileID: 2380306010586169003}
+  - component: {fileID: 1398208769111914670}
   m_Layer: 0
   m_Name: Pink_Default
   m_TagString: Block
@@ -73,8 +73,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -726530115
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: a37b1b27d9770b74ab41b9bf7b8f5993, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -116,7 +116,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 2.120794, y: 2.4661798, z: 2}
   m_Center: {x: -0.015792012, y: 0.022444248, z: 0.88699675}
---- !u!114 &2380306010586169003
+--- !u!114 &1398208769111914670
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -125,9 +125,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 4346571933986002533}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 545ef7620f6423348acb950dad251782, type: 3}
+  m_Script: {fileID: 11500000, guid: 6793e5a6b1a23cf4bbd487e1aa118fa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sprites:
+  - {fileID: 21300000, guid: a37b1b27d9770b74ab41b9bf7b8f5993, type: 3}
+  - {fileID: 21300000, guid: 5f65a3c82268976429e9bb47cae93384, type: 3}
+  - {fileID: 21300000, guid: 04c8182037c29e34982730e2d19d6457, type: 3}
+  - {fileID: 21300000, guid: 574fca0999c95134aa7c2481ed0e546d, type: 3}
   blockType: 2
-  blockState: 0
-  parentGroupID: 15
+  parentGroupID: 0

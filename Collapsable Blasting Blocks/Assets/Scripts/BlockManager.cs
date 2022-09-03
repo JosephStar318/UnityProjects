@@ -8,6 +8,7 @@ public class BlockManager : MonoBehaviour
     public static BlockManager instance;
 
     public List<GameObject> prefabBlocks;
+    public GameObject cover;
     private Block[,] blockMatrix;
     private bool[,] occurenceMatrix;
 
@@ -25,13 +26,20 @@ public class BlockManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        instance = this;
-        blockMatrix = new Block[rows*2, columns];
-        occurenceMatrix = new bool[rows, columns];
+        InitializeParameters();
         SpawnBlocks();
         CheckGroups();
+    }
 
-        
+    private void InitializeParameters()
+    {
+        instance = this;
+        blockMatrix = new Block[rows * 2, columns];
+        occurenceMatrix = new bool[rows, columns];
+        blockTypeCount = prefabBlocks.Count;
+        gapX = prefabBlocks[0].transform.localScale.x * 2.2f;
+        gapY = prefabBlocks[0].transform.localScale.y * 2.5f;
+        cover.transform.position = new Vector3(cover.transform.position.x, spawnOffsetY + rows * gapY, cover.transform.position.z);
     }
 
     private void CheckGroups()
@@ -46,28 +54,36 @@ public class BlockManager : MonoBehaviour
                     ClusterCheck(i,j, bg);
                     bg.blocks.Add(blockMatrix[i, j]);
                     bg.GroupID = groupIDCounter++;
-                    BlockGroup.blockGroups.Add(bg);
-                    ChanceBlockState(bg);
-
+                    if(bg.blocks.Count > 1)
+                    {
+                        BlockGroup.blockGroups.Add(bg);
+                    }
+                    ChangeBlockState(bg);
                 }
             }
         }
     }
 
-    private void ChanceBlockState(BlockGroup bg)
+    private void ChangeBlockState(BlockGroup bg)
     {
-        if(bg.blocks.Count > 4)
+        if (bg.blocks.Count < 4)
+        {
+            bg.blocks.ForEach(block => block.BlockState = BlockState.Default);
+        }
+        else if (bg.blocks.Count >= 4 && bg.blocks.Count < 6)
         {
             bg.blocks.ForEach(block => block.BlockState = BlockState.First);
         }
-        else if(bg.blocks.Count > 4 && bg.blocks.Count < 6)
+        else if (bg.blocks.Count >= 6 && bg.blocks.Count < 8)
         {
             bg.blocks.ForEach(block => block.BlockState = BlockState.Second);
         }
-        else if (bg.blocks.Count > 6)
+        else
         {
             bg.blocks.ForEach(block => block.BlockState = BlockState.Third);
         }
+
+
     }
 
     /*
@@ -129,11 +145,7 @@ public class BlockManager : MonoBehaviour
     private void SpawnBlocks()
     {
         int randomType;
-
-        blockTypeCount = prefabBlocks.Count;
-        gapX = prefabBlocks[0].transform.localScale.x * 2.2f;
-        gapY = prefabBlocks[0].transform.localScale.y * 2.5f;
-
+       
         for (int i = 0; i < rows*2; i++)
         {
             for (int j = 0; j < columns; j++)
@@ -141,14 +153,9 @@ public class BlockManager : MonoBehaviour
                 randomType = Random.Range(0, blockTypeCount);
                 Vector3 spawnPos = new Vector3(spawnOffsetX + j * gapX, spawnOffsetY + i * gapY,-5);
                 GameObject instance = Instantiate(prefabBlocks[randomType], spawnPos, Quaternion.identity);
-                blockMatrix[i, j] = new Block(
-                    prefabBlocks[randomType].GetComponent<BlockComponent>().blockType,
-                    prefabBlocks[randomType].GetComponent<BlockComponent>().blockState,
-                    instance
-                    );
+                blockMatrix[i, j] = instance.GetComponent<Block>();
             }
         }
-
     }
     public void CollapseBlocks()
     {
@@ -158,7 +165,7 @@ public class BlockManager : MonoBehaviour
             int nullCount = 0;
             for (int i = 0; i < rows*2; i++)
             {
-                if (blockMatrix[i, j].block == null)
+                if (blockMatrix[i, j] == null)
                 {
                     nullCount++;
                 }
@@ -188,16 +195,12 @@ public class BlockManager : MonoBehaviour
         {
             for (int j = 0; j < columns; j++)
             {
-                if(blockMatrix[i,j].block == null)
+                if(blockMatrix[i,j] == null)
                 {
                     randomType = Random.Range(0, blockTypeCount);
                     Vector3 spawnPos = new Vector3(spawnOffsetX + j * gapX, spawnOffsetY + i * gapY, -5);
                     GameObject instance = Instantiate(prefabBlocks[randomType], spawnPos, Quaternion.identity);
-                    blockMatrix[i, j] = new Block(
-                    prefabBlocks[randomType].GetComponent<BlockComponent>().blockType,
-                    prefabBlocks[randomType].GetComponent<BlockComponent>().blockState,
-                    instance
-                    );
+                    blockMatrix[i, j] = instance.GetComponent<Block>();
                 }
             }
         }
@@ -209,8 +212,73 @@ public class BlockManager : MonoBehaviour
         if (isBlasted)
         {
             //make a delay to catch up with destroy metod
-            Invoke(nameof(CollapseBlocks), 2);
-            isBlasted = false;
+            StartCoroutine(Delay());
+        }
+        if(BlockGroup.blockGroups.Count == 0)
+        {
+            ShuffleBlocks();
+            CheckGroups();
+        }
+    }
+
+    IEnumerator Delay()
+    {
+        yield return new WaitForSeconds(2);
+        CollapseBlocks();
+        isBlasted = false;
+    }
+
+    private void ShuffleBlocks()
+    {
+        List<Block> tempBlocks = new List<Block>();
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < columns; j++)
+            {
+                tempBlocks.Add(blockMatrix[i, j]);
+            }
+        }
+        tempBlocks.Shuffle<Block>();
+        int counter = 0;
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < columns; j++)
+            {
+                blockMatrix[i, j] = tempBlocks[counter++];
+                blockMatrix[i, j].gameObject.SetActive(false);
+            }
+        }
+        // change the positions of objects bases on the matrix indexes
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < columns; j++)
+            {
+                Vector3 position = new Vector3(spawnOffsetX + j * gapX, spawnOffsetY + i * gapY, -5);
+                blockMatrix[i, j].gameObject.transform.position = position;
+            }
+        }
+        foreach (var item in blockMatrix)
+        {
+            item.gameObject.SetActive(true);
         }
     }
 }
+public static class Extensions
+{
+    public static System.Random rng = new System.Random();
+
+    public static void Shuffle<T>(this IList<T> list)
+    {
+        int n = list.Count;
+        while (n > 1)
+        {
+            n--;
+            int k = rng.Next(n + 1);
+            T value = list[k];
+            list[k] = list[n];
+            list[n] = value;
+        }
+    }
+}
+
+

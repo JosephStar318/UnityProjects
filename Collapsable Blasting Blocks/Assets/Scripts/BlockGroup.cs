@@ -6,7 +6,6 @@ public class BlockGroup
 {
     public static List<BlockGroup> blockGroups = new List<BlockGroup>();
     public List<Block> blocks = new List<Block>();
-
     private int groupID;
 
     public int GroupID 
@@ -16,7 +15,7 @@ public class BlockGroup
         { 
             groupID = value;
             //whenever group id set, each child's parentGroupID will be set as well
-            blocks.ForEach(item => item.block.GetComponent<BlockComponent>().parentGroupID = value);
+            blocks.ForEach(block => block.parentGroupID = value);
         }
     }
 }

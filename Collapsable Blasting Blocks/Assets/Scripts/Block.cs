@@ -3,36 +3,39 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class Block
+public class Block : MonoBehaviour
 {
+    public List<Sprite> sprites;
+
     public BlockType blockType;
     private BlockState blockState;
-    public GameObject block;
-
+    public int parentGroupID;
     public BlockState BlockState 
     {
         get => blockState; 
         set
         {
-            if(BlockState == BlockState.First)
-            {
-                if(blockType == BlockType.Blue)
-                {
-                    //change sprite
-                }
-            }
+            blockState = value;
+            GetComponent<SpriteRenderer>().sprite = sprites[(int)blockState];
         } 
     }
-
-    public Block()
+    private void OnMouseDown()
     {
-
-    }
-    public Block(BlockType blockType, BlockState blockState, GameObject block)
-    {
-        this.blockType = blockType;
-        this.BlockState = blockState;
-        this.block = block;
+        if (BlockManager.instance.isBlasted == false)
+        {
+            //destroy blocks
+            foreach (var item in BlockGroup.blockGroups)
+            {
+                if (item.blocks.Count > 1)
+                {
+                    if (item.GroupID == parentGroupID)
+                    {
+                        BlockManager.instance.isBlasted = true;
+                        item.blocks.ForEach(block => Destroy(block.gameObject));
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2818886380477016728}
   - component: {fileID: 2818886380477016735}
   - component: {fileID: 2739356422339841918}
-  - component: {fileID: 2194129388412441629}
+  - component: {fileID: -2738157361894360172}
   m_Layer: 0
   m_Name: Purple_Default
   m_TagString: Block
@@ -73,8 +73,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -726530115
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 7f8545730f85c1640a9556ea36f778e4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -116,7 +116,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 2.120794, y: 2.4661798, z: 2}
   m_Center: {x: -0.015792012, y: 0.022444248, z: 0.88699675}
---- !u!114 &2194129388412441629
+--- !u!114 &-2738157361894360172
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -125,9 +125,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 2818886380477016734}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 545ef7620f6423348acb950dad251782, type: 3}
+  m_Script: {fileID: 11500000, guid: 6793e5a6b1a23cf4bbd487e1aa118fa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sprites:
+  - {fileID: 21300000, guid: 7f8545730f85c1640a9556ea36f778e4, type: 3}
+  - {fileID: 21300000, guid: 003a3936e67da944089dee9f969497bd, type: 3}
+  - {fileID: 21300000, guid: 7b88a37424531294a8e617b15e2ae5f5, type: 3}
+  - {fileID: 21300000, guid: 92b02e762fbc5e74dad419e1fcbcf4c3, type: 3}
   blockType: 3
-  blockState: 0
-  parentGroupID: 12
+  parentGroupID: 0

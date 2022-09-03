@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8072147740332601282}
   - component: {fileID: 8072147740332601281}
   - component: {fileID: 8072147740332601292}
-  - component: {fileID: -8476237274904385559}
+  - component: {fileID: 112910678735061402}
   m_Layer: 0
   m_Name: Yellow_Default
   m_TagString: Block
@@ -73,8 +73,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -726530115
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 704e730dbeccbb84f9c3a009bb9af3c4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -116,7 +116,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 2.120794, y: 2.4661798, z: 2}
   m_Center: {x: -0.015792012, y: 0.022444248, z: 0.88699675}
---- !u!114 &-8476237274904385559
+--- !u!114 &112910678735061402
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -125,9 +125,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 8072147740332601280}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 545ef7620f6423348acb950dad251782, type: 3}
+  m_Script: {fileID: 11500000, guid: 6793e5a6b1a23cf4bbd487e1aa118fa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sprites:
+  - {fileID: 21300000, guid: 704e730dbeccbb84f9c3a009bb9af3c4, type: 3}
+  - {fileID: 21300000, guid: a35f2ddd501907e40a4aa748360cd9d2, type: 3}
+  - {fileID: 21300000, guid: cf94fea77fb67cc449af5d814c717bf2, type: 3}
+  - {fileID: 21300000, guid: ef535b13095b23d4cabee6d5e0be434e, type: 3}
   blockType: 5
-  blockState: 0
-  parentGroupID: 14
+  parentGroupID: 0
