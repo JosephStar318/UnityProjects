@@ -12,7 +12,13 @@ public class BlockManager : MonoBehaviour
     private Block[,] blockMatrix;
     private bool[,] occurenceMatrix;
 
+    private AudioSource audioSource;
+    public AudioClip shuffleClip;
+    public AudioClip popClip;
+    public ParticleSystem shuffleParticles;
+
     public bool isBlasted = false;
+    private bool isCoroutineRunning = false;
     private int groupIDCounter = 0;
 
     public int rows;
@@ -40,6 +46,7 @@ public class BlockManager : MonoBehaviour
         gapX = prefabBlocks[0].transform.localScale.x * 2.2f;
         gapY = prefabBlocks[0].transform.localScale.y * 2.5f;
         cover.transform.position = new Vector3(cover.transform.position.x, spawnOffsetY + rows * gapY, cover.transform.position.z);
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void CheckGroups()
@@ -209,23 +216,29 @@ public class BlockManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isBlasted)
+        if (isBlasted == true && isCoroutineRunning == false)
         {
             //make a delay to catch up with destroy metod
-            StartCoroutine(Delay());
+            StartCoroutine(DelayBeforeCollapse());
+            audioSource.PlayOneShot(popClip);
+            isCoroutineRunning = true;
+            
         }
-        if(BlockGroup.blockGroups.Count == 0)
+        if (BlockGroup.blockGroups.Count == 0)
         {
             ShuffleBlocks();
+            shuffleParticles.Play();
+            audioSource.PlayOneShot(shuffleClip);
             CheckGroups();
         }
     }
 
-    IEnumerator Delay()
+    public IEnumerator DelayBeforeCollapse()
     {
         yield return new WaitForSeconds(2);
         CollapseBlocks();
         isBlasted = false;
+        isCoroutineRunning = false;
     }
 
     private void ShuffleBlocks()
