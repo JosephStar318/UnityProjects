@@ -13,26 +13,16 @@ public class PitScript : MonoBehaviour
     private List<GameObject> objects = new List<GameObject>();
     private int targetScore = 1;
     
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     private void OnTriggerEnter(Collider other)
     {
         if(other.CompareTag("Object"))
         {
             objects.Add(other.gameObject);
             ChangeScoreText();
-            if (objects.Count >= targetScore)
+            if (objects.Count == targetScore)
             {
                 OnLevelPassed?.Invoke();
+                transform.GetComponentInChildren<Elevator>().ElevatorUp();
             }
         }
     }

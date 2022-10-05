@@ -14,6 +14,9 @@ public class MovePlatform : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        rb.MovePosition(new Vector3(rb.position.x,rb.position.y,rb.position.z-speed));
+        if(GameManager.Instance.isFinished == false)
+        {
+            rb.MovePosition(new Vector3(rb.position.x,rb.position.y,rb.position.z-speed));
+        }
     }
 }

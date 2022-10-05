@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
-public class Move : MonoBehaviour
+public class CollectorScript : MonoBehaviour
 {
+    public static event Action<GameObject> OnFinished;
     public float speed;
     public float xLimit;
     private Rigidbody rb;
@@ -18,15 +20,20 @@ public class Move : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        //VerticalMove();
-        HorizontalMove();
+        if (GameManager.Instance.isFinished == false)
+        {
+            HorizontalMove();
+        }
     }
 
-    private void VerticalMove()
+    void OnTriggerEnter(Collider other)
     {
-        //rb.velocity = transform.forward * speed;
-        rb.MovePosition(new Vector3(rb.position.x, rb.position.y, rb.position.z + speed));
-
+        if (other.CompareTag("Finish"))
+        {
+            OnFinished?.Invoke(other.transform.parent.gameObject);
+            GetComponentInChildren<Animator>().CrossFade("Flip", 0);
+            Destroy(other.gameObject);
+        }
     }
 
     private void HorizontalMove()
@@ -67,4 +74,5 @@ public class Move : MonoBehaviour
             }
         }
     }
+
 }
