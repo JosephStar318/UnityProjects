@@ -110,7 +110,6 @@ GameObject:
   - component: {fileID: 5818114185489965870}
   - component: {fileID: 5818114185491063278}
   - component: {fileID: 5818114185483570414}
-  - component: {fileID: 8969579320140255157}
   m_Layer: 0
   m_Name: tree12
   m_TagString: Untagged
@@ -203,20 +202,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!64 &8969579320140255157
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5818114185493069614}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 4300000, guid: 8acba457351874d469c7a7d0421a33f5, type: 3}
 --- !u!1 &6916288966969374055
 GameObject:
   m_ObjectHideFlags: 0
