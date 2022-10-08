@@ -5,16 +5,22 @@ using UnityEngine;
 public class ObjectScript : MonoBehaviour
 {
     private AudioSource audioSource;
+    private Rigidbody rb;
     public ParticleSystem destroyParticles;
     public AudioClip popSound;
-    // Start is called before the first frame update
+    public float pushForce;
+
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
+        rb = GetComponent<Rigidbody>();
+        rb.isKinematic = true;
     }
     private void OnTriggerEnter(Collider other)
     {
-        if(other.CompareTag("Sack"))
+        rb.isKinematic = false;
+
+        if (other.CompareTag("Sack"))
         {
             audioSource.PlayOneShot(popSound);
         }
@@ -24,5 +30,9 @@ public class ObjectScript : MonoBehaviour
             Instantiate(destroyParticles, transform);
             Destroy(gameObject,0.2f);
         }
+    }
+    public void PushForward()
+    {
+        rb.AddForce(pushForce * Vector3.forward, ForceMode.VelocityChange);
     }
 }

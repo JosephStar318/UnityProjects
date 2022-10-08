@@ -11,12 +11,17 @@ public class PitScript : MonoBehaviour
     public GameObject scoreText;
 
     private List<GameObject> objects = new List<GameObject>();
-    private int targetScore = 1;
-    
+    private int targetScore = 4;
+
+    private void Start()
+    {
+        ChangeScoreText();
+    }
     private void OnTriggerEnter(Collider other)
     {
         if(other.CompareTag("Object"))
         {
+            GameManager.Instance.objectTimer = 0;
             objects.Add(other.gameObject);
             ChangeScoreText();
             if (objects.Count == targetScore)
@@ -29,6 +34,7 @@ public class PitScript : MonoBehaviour
     public void SetTargetScore(int newTarget)
     {
         targetScore = newTarget;
+        ChangeScoreText();
     }
 
     private void ChangeScoreText()

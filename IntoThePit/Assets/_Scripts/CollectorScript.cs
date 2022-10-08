@@ -5,12 +5,12 @@ using System;
 
 public class CollectorScript : MonoBehaviour
 {
-    public static event Action<GameObject> OnFinished;
+    public static event Action OnFinished;
     public float speed;
     public float xLimit;
     private Rigidbody rb;
     private bool moveAllowed;
-
+    private bool isColliding;
     // Start is called before the first frame update
     void Start()
     {
@@ -28,12 +28,18 @@ public class CollectorScript : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Finish"))
+        if (other.CompareTag("Finish") && !isColliding)
         {
-            OnFinished?.Invoke(other.transform.parent.gameObject);
-            GetComponentInChildren<Animator>().CrossFade("Flip", 0);
+            OnFinished?.Invoke();
             Destroy(other.gameObject);
+            isColliding = true;
+            StartCoroutine(WaitTrigger());
         }
+    }
+    private IEnumerator WaitTrigger()
+    {
+        yield return new WaitForEndOfFrame();
+        isColliding = false;
     }
 
     private void HorizontalMove()

@@ -15,22 +15,25 @@ public class ObjectHandler : MonoBehaviour
     {
         CollectorScript.OnFinished -= PushObjects;
     }
-    private void PushObjects(GameObject none)
+    private void PushObjects()
     {
-        objects.ForEach(obj => obj.GetComponent<Rigidbody>().AddForce(Vector3.forward * 200, ForceMode.Impulse));
-        StartCoroutine(DestroyObjects());
-    }
-
-    private IEnumerator DestroyObjects()
-    {
-        yield return new WaitForSeconds(3);
+        objects.RemoveAll(item => item == null);
         foreach (GameObject obj in objects)
         {
-            Destroy(obj);
+            obj.GetComponent<ObjectScript>().PushForward();
         }
-        objects.Clear();
     }
-
+    private void Update()
+    {
+        if(GameManager.Instance.isLevelPassed)
+        {
+            foreach (GameObject obj in objects)
+            {
+                Destroy(obj);
+            }
+            objects.Clear();
+        }
+    }
     private void OnTriggerEnter(Collider other)
     {
         if(other.CompareTag("Object"))
