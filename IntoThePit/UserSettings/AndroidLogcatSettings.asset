@@ -12,6 +12,18 @@
             "deviceId": "5af168a2",
             "name": "com.unity3d.mobileremote",
             "processId": 16342,
+            "exited": true
+        },
+        {
+            "deviceId": "5af168a2",
+            "name": "com.unity3d.mobileremote",
+            "processId": 4526,
+            "exited": true
+        },
+        {
+            "deviceId": "5af168a2",
+            "name": "com.unity3d.mobileremote",
+            "processId": 481,
             "exited": false
         }
     ],

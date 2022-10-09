@@ -12,7 +12,6 @@ public class PitScript : MonoBehaviour
 
     private List<GameObject> objects = new List<GameObject>();
     private int targetScore = 4;
-
     private void Start()
     {
         ChangeScoreText();
@@ -21,16 +20,21 @@ public class PitScript : MonoBehaviour
     {
         if(other.CompareTag("Object"))
         {
-            GameManager.Instance.objectTimer = 0;
-            objects.Add(other.gameObject);
-            ChangeScoreText();
-            if (objects.Count == targetScore)
+            //to prevent multiple triggers since blue object has box collider and capsule collider
+            if(other.GetType() == typeof(BoxCollider) || other.GetType() == typeof(SphereCollider))
             {
-                OnLevelPassed?.Invoke();
-                transform.GetComponentInChildren<Elevator>().ElevatorUp();
+                GameManager.Instance.objectTimer = 0;
+                objects.Add(other.gameObject);
+                ChangeScoreText();
+                if (objects.Count == targetScore)
+                {
+                    OnLevelPassed?.Invoke();
+                    transform.GetComponentInChildren<Elevator>().ElevatorUp();
+                }
             }
         }
     }
+   
     public void SetTargetScore(int newTarget)
     {
         targetScore = newTarget;

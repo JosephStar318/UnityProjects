@@ -111,7 +111,7 @@ MonoBehaviour:
   destroyParticles: {fileID: 5585671604984661011, guid: 3c5347c5374f1cc46ac51f73e44d7aee,
     type: 3}
   popSound: {fileID: 8300000, guid: ec07842234277654c9ddd721581da21b, type: 3}
-  pushForce: 10
+  pushForce: 30
 --- !u!82 &2251690690965324245
 AudioSource:
   m_ObjectHideFlags: 0

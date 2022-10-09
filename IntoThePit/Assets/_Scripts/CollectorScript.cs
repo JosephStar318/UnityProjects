@@ -8,6 +8,7 @@ public class CollectorScript : MonoBehaviour
     public static event Action OnFinished;
     public float speed;
     public float xLimit;
+    public LayerMask discludeCollector;
     private Rigidbody rb;
     private bool moveAllowed;
     private bool isColliding;
@@ -50,7 +51,7 @@ public class CollectorScript : MonoBehaviour
             Touch touch = Input.GetTouch(0);
             Ray touchRay = Camera.main.ScreenPointToRay(touch.position);
             RaycastHit hit;
-            Physics.Raycast(touchRay, out hit);
+            Physics.Raycast(touchRay, out hit, discludeCollector);
 
             if (touch.phase == TouchPhase.Began)
             {
@@ -60,17 +61,18 @@ public class CollectorScript : MonoBehaviour
             {
                 if (moveAllowed)
                 {
-                    if (rb.position.x > xLimit)
+                    if (hit.point.x >= xLimit)
                     {
                         rb.position = new Vector3(xLimit, rb.position.y, rb.position.z);
                     }
-                    else if (rb.position.x < -xLimit)
+                    else if (hit.point.x <= -xLimit)
                     {
                         rb.position = new Vector3(-xLimit, rb.position.y, rb.position.z);
                     }
                     else
                     {
                         rb.MovePosition(new Vector3(hit.point.x, rb.position.y, rb.position.z));
+                        
                     }
                 }
             }

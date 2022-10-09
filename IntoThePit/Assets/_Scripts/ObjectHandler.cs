@@ -41,4 +41,8 @@ public class ObjectHandler : MonoBehaviour
             objects.Add(other.gameObject);
         }
     }
+    private void OnTriggerExit(Collider other)
+    {
+        objects.Remove(other.gameObject);
+    }
 }

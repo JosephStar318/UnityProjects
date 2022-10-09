@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour
     public GameObject collector;
 
     public float objectTimer;
+    public float speedModifier;
 
     public bool isFinished;
     public bool isLevelPassed;
@@ -45,24 +46,29 @@ public class GameManager : MonoBehaviour
     {
         PitScript.OnLevelPassed += OnLevelPassed;
         CollectorScript.OnFinished += OnLevelFinished;
+        LevelScript.OnLevelDestroyed += OnLevelDestroyed;
     }
+
     private void OnDisable()
     {
         PitScript.OnLevelPassed -= OnLevelPassed;
         CollectorScript.OnFinished -= OnLevelFinished;
+        LevelScript.OnLevelDestroyed -= OnLevelDestroyed;
     }
 
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
-        InitializeGameLevels();
+
         if (int.TryParse(FileHandler.ReadFile("current_level"),out int result))
         {
-            for (int i = 1; i <= result; i++)
-            {
-                CurrentLevelCount = result;
-            }
+            currentLevelCount = result;
         }
+        else
+        {
+            currentLevelCount = 1;
+        }
+        InitializeGameLevels();
     }
     void Update()
     {
@@ -71,14 +77,7 @@ public class GameManager : MonoBehaviour
         {
             isGameStarted = true;
             startScreen.SetActive(false);
-            HUD.SetActive(true);
-            ReplayLevel();
-        }
-        //clear levels if there is certain amount of level reached
-        if (levelList.Count>15)
-        {
-            Destroy(levelList[0]);
-            levelList.RemoveAt(0);
+            ContinueGame();
         }
         //wait for objects to fall into the pit
         if (isFinished && !isGamePaused)
@@ -114,9 +113,15 @@ public class GameManager : MonoBehaviour
         isFinished = true;
     }
 
-    private void HUDAnimation()
+    private void OnLevelDestroyed()
     {
-        HUD.GetComponent<Animation>().Play();
+        levelList.RemoveAt(0);
+    }
+    private void InitializeGameLevels()
+    {
+        lastLevel = levelList[levelList.Count - 1];
+        if (currentLevelCount > 1)  LoadCheckpoint();
+        else                        LoadNewGame();
     }
 
     private void CreateRandomLevel()
@@ -129,6 +134,8 @@ public class GameManager : MonoBehaviour
 
         SaveGameProgress();
     }
+
+    //creates levels based on level data list
     private void CreateLevels()
     {
         foreach (GameObject level in levelList)
@@ -141,88 +148,64 @@ public class GameManager : MonoBehaviour
         {
             lastLevel = Instantiate(levelPrefabs[levelDataList[i].levelID], spawnPos, Quaternion.identity);
             //set level data from saved levels
-            lastLevel.GetComponent<LevelScript>().SetLevelData(levelDataList[i].levelID, levelDataList[i].levelTargetScore, levelDataList[i].levelSpeed);
+            lastLevel.GetComponent<LevelScript>().SetLevelData(levelDataList[i].levelID, levelDataList[i].levelTargetScore, levelDataList[i].levelSpeed + speedModifier);
             //child is end position game object
             spawnPos = lastLevel.transform.GetChild(0).position;
             levelList.Add(lastLevel);
         }
     }
 
-    private void LoadCheckpoint(int levelIndex)
-    {
-        levelDataList = FileHandler.ReadJson<LevelData>("level_data");
-        CreateLevels();
-        //move collector to current unfinished level
-        MoveCollector(levelList[levelIndex - 1].transform.position);
-        endScreen.SetActive(false);
-        HUD.SetActive(true);
-        isFinished = false;
-        isGamePaused = false;
-    }
-    private void LoadNewGame()
-    {
-        CreateLevels();
-        //move collector to current unfinished level
-        MoveCollector(levelList[0].transform.position);
-        currentLevelCount = 1;
-        endScreen.SetActive(false);
-        HUD.SetActive(true);
-        isFinished = false;
-        isGamePaused = false;
-    }
-
-    private void MoveCollector(Vector3 spawnPos)
-    {
-        collector.transform.position = spawnPos + new Vector3(0f,0.5f,5f);
-    }
-
-    private void InitializeGameLevels()
-    {
-        currentLevelCount = 1;
-        lastLevel = levelList[levelList.Count - 1];
-        foreach (GameObject obj in levelList)
-        {
-            levelDataList.Add(obj.GetComponent<LevelScript>().GetLevelData());
-        }
-        if (levelDataList.Count > 10)
-        {
-            // only keep first 10 element
-            levelDataList.RemoveRange(10, levelDataList.Count - 10);
-        }
-        FileHandler.WriteJson<LevelData>("level_data", levelDataList);
-    }
     private void SaveGameProgress()
     {
+        levelDataList.RemoveAt(0);
         levelDataList.Add(lastLevel.GetComponent<LevelScript>().GetLevelData());
         FileHandler.WriteJson<LevelData>("level_data", levelDataList);
         FileHandler.WriteFile("current_level", currentLevelCount.ToString());
     }
 
-    public void NewGame()
+    public void LoadNewGame()
     {
-        LoadNewGame();
-        HUD.GetComponent<HUD>().UpdateLevelIndicator();
+        foreach (GameObject obj in levelList)
+        {
+            levelDataList.Add(obj.GetComponent<LevelScript>().GetLevelData());
+        }
+        FileHandler.WriteJson<LevelData>("level_data", levelDataList);
+        CreateLevels();
+    }
+    private void LoadCheckpoint()
+    {
+        levelDataList = FileHandler.ReadJson<LevelData>("level_data");
+        CreateLevels();
     }
 
     public void ContinueGame()
     {
+        if(currentLevelCount > 10)
+        {
+            speedModifier += 0.02f;
+        }
+        endScreen.SetActive(false);
+        pauseScreen.SetActive(false);
+        HUD.SetActive(true);
         isFinished = false;
         isGamePaused = false;
-        pauseScreen.SetActive(false);
     }
 
     public void ReplayLevel()
     {
-        if (currentLevelCount > 1)
-        {
-            LoadCheckpoint(currentLevelCount);
-        }
-        else
-        {
-            NewGame();
-        }
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
+    public void RestartGame()
+    {
+        currentLevelCount = 1;
+        FileHandler.WriteFile("current_level", currentLevelCount.ToString());
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+    private void HUDAnimation()
+    {
+        HUD.GetComponent<Animation>().Play();
+    }
 
     public void ExitGame()
     {
