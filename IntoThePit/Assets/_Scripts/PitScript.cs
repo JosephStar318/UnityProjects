@@ -10,8 +10,9 @@ public class PitScript : MonoBehaviour
 
     public GameObject scoreText;
 
-    private List<GameObject> objects = new List<GameObject>();
     private int targetScore = 4;
+    private int score;
+    private bool levelPassed;
     private void Start()
     {
         ChangeScoreText();
@@ -24,10 +25,11 @@ public class PitScript : MonoBehaviour
             if(other.GetType() == typeof(BoxCollider) || other.GetType() == typeof(SphereCollider))
             {
                 GameManager.Instance.objectTimer = 0;
-                objects.Add(other.gameObject);
+                score += other.GetComponent<ObjectScript>().point;
                 ChangeScoreText();
-                if (objects.Count == targetScore)
+                if (score >= targetScore && !levelPassed)
                 {
+                    levelPassed = true;
                     OnLevelPassed?.Invoke();
                     transform.GetComponentInChildren<Elevator>().ElevatorUp();
                 }
@@ -43,6 +45,6 @@ public class PitScript : MonoBehaviour
 
     private void ChangeScoreText()
     {
-        scoreText.GetComponent<TextMeshPro>().SetText(objects.Count + " / " + targetScore);
+        scoreText.GetComponent<TextMeshPro>().SetText(score + " / " + targetScore);
     }
 }

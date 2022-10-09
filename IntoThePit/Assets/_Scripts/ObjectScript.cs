@@ -9,6 +9,7 @@ public class ObjectScript : MonoBehaviour
     public ParticleSystem destroyParticles;
     public AudioClip popSound;
     public float pushForce;
+    public int point;
 
     void Start()
     {

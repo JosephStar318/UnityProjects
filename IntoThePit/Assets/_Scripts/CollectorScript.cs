@@ -10,7 +10,6 @@ public class CollectorScript : MonoBehaviour
     public float xLimit;
     public LayerMask discludeCollector;
     private Rigidbody rb;
-    private bool moveAllowed;
     private bool isColliding;
     // Start is called before the first frame update
     void Start()
@@ -42,7 +41,6 @@ public class CollectorScript : MonoBehaviour
         yield return new WaitForEndOfFrame();
         isColliding = false;
     }
-
     private void HorizontalMove()
     {
         //if there player is touching the screen
@@ -51,15 +49,9 @@ public class CollectorScript : MonoBehaviour
             Touch touch = Input.GetTouch(0);
             Ray touchRay = Camera.main.ScreenPointToRay(touch.position);
             RaycastHit hit;
-            Physics.Raycast(touchRay, out hit, discludeCollector);
-
-            if (touch.phase == TouchPhase.Began)
+            if(Physics.Raycast(touchRay, out hit, 100f, discludeCollector))
             {
-                moveAllowed = true;
-            }
-            if (touch.phase == TouchPhase.Moved)
-            {
-                if (moveAllowed)
+                if (touch.phase == TouchPhase.Moved)
                 {
                     if (hit.point.x >= xLimit)
                     {
@@ -72,15 +64,9 @@ public class CollectorScript : MonoBehaviour
                     else
                     {
                         rb.MovePosition(new Vector3(hit.point.x, rb.position.y, rb.position.z));
-                        
                     }
                 }
             }
-            if (touch.phase == TouchPhase.Ended)
-            {
-                moveAllowed = false;
-            }
         }
     }
-
 }

@@ -59,7 +59,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
-
+        speedModifier = 0.02f;
         if (int.TryParse(FileHandler.ReadFile("current_level"),out int result))
         {
             currentLevelCount = result;
@@ -116,6 +116,7 @@ public class GameManager : MonoBehaviour
     private void OnLevelDestroyed()
     {
         levelList.RemoveAt(0);
+        levelDataList.RemoveAt(0);
     }
     private void InitializeGameLevels()
     {
@@ -130,7 +131,6 @@ public class GameManager : MonoBehaviour
         Vector3 spawnPos = lastLevel.transform.GetChild(0).position;
         lastLevel = Instantiate(levelPrefabs[randomIndex], spawnPos, Quaternion.identity);
         levelList.Add(lastLevel);
-        lastLevel.GetComponent<LevelScript>().SetLevelData(randomIndex, 4, 0.3f);
 
         SaveGameProgress();
     }
@@ -148,7 +148,7 @@ public class GameManager : MonoBehaviour
         {
             lastLevel = Instantiate(levelPrefabs[levelDataList[i].levelID], spawnPos, Quaternion.identity);
             //set level data from saved levels
-            lastLevel.GetComponent<LevelScript>().SetLevelData(levelDataList[i].levelID, levelDataList[i].levelTargetScore, levelDataList[i].levelSpeed + speedModifier);
+            lastLevel.GetComponent<LevelScript>().SetLevelData(levelDataList[i].levelID, levelDataList[i].levelTargetScore, levelDataList[i].levelSpeed);
             //child is end position game object
             spawnPos = lastLevel.transform.GetChild(0).position;
             levelList.Add(lastLevel);
@@ -178,12 +178,21 @@ public class GameManager : MonoBehaviour
         CreateLevels();
     }
 
+    public void ContinueButton()
+    {
+        if (currentLevelCount > 10)
+        {
+            levelDataList.Clear();
+            foreach (GameObject level in levelList)
+            {
+                levelDataList.Add(level.GetComponent<LevelScript>().IncreaseLevelSpeed(speedModifier));
+            }
+            FileHandler.WriteJson<LevelData>("level_data", levelDataList);
+        }
+        ContinueGame();
+    }
     public void ContinueGame()
     {
-        if(currentLevelCount > 10)
-        {
-            speedModifier += 0.02f;
-        }
         endScreen.SetActive(false);
         pauseScreen.SetActive(false);
         HUD.SetActive(true);

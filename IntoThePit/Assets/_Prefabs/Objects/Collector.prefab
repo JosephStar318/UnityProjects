@@ -541,7 +541,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0.4
-  xLimit: 13.5
+  xLimit: 12.5
+  discludeCollector:
+    serializedVersion: 2
+    m_Bits: 182
 --- !u!1 &7173725626264301203
 GameObject:
   m_ObjectHideFlags: 0
