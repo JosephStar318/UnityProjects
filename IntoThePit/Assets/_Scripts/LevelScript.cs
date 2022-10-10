@@ -38,6 +38,14 @@ public class LevelScript : MonoBehaviour
         levelData.levelSpeed = levelSpeed;
         GetComponentInChildren<PitScript>().SetTargetScore(levelTargetScore);
     }
+    public void SetLevelSpeed(float levelSpeed)
+    {
+        levelData.levelSpeed = levelSpeed;
+    }
+    public float GetLevelSpeed()
+    {
+        return levelData.levelSpeed;
+    }
     public LevelData IncreaseLevelSpeed(float levelSpeed)
     {
         levelData.levelSpeed += levelSpeed;

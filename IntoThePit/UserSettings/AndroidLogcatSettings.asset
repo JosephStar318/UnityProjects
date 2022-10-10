@@ -11,32 +11,26 @@
         {
             "deviceId": "5af168a2",
             "name": "com.unity3d.mobileremote",
-            "processId": 16342,
-            "exited": true
-        },
-        {
-            "deviceId": "5af168a2",
-            "name": "com.unity3d.mobileremote",
-            "processId": 4526,
-            "exited": true
-        },
-        {
-            "deviceId": "5af168a2",
-            "name": "com.unity3d.mobileremote",
-            "processId": 481,
-            "exited": true
-        },
-        {
-            "deviceId": "5af168a2",
-            "name": "com.unity3d.mobileremote",
-            "processId": 22654,
-            "exited": true
-        },
-        {
-            "deviceId": "5af168a2",
-            "name": "com.unity3d.mobileremote",
             "processId": 11579,
-            "exited": false
+            "exited": true
+        },
+        {
+            "deviceId": "5af168a2",
+            "name": "com.unity3d.mobileremote",
+            "processId": 22897,
+            "exited": true
+        },
+        {
+            "deviceId": "5af168a2",
+            "name": "com.android.settings",
+            "processId": 30175,
+            "exited": true
+        },
+        {
+            "deviceId": "5af168a2",
+            "name": "com.whatsapp",
+            "processId": 11972,
+            "exited": true
         }
     ],
     "m_Tags": {

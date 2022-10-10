@@ -117,6 +117,8 @@ public class GameManager : MonoBehaviour
     {
         levelList.RemoveAt(0);
         levelDataList.RemoveAt(0);
+        FileHandler.WriteJson<LevelData>("level_data", levelDataList);
+        FileHandler.WriteFile("current_level", currentLevelCount.ToString());
     }
     private void InitializeGameLevels()
     {
@@ -129,7 +131,10 @@ public class GameManager : MonoBehaviour
     {
         int randomIndex = Random.Range(0, levelPrefabs.Count);
         Vector3 spawnPos = lastLevel.transform.GetChild(0).position;
+        float lastLevelSpeed = lastLevel.GetComponent<LevelScript>().GetLevelSpeed();
+
         lastLevel = Instantiate(levelPrefabs[randomIndex], spawnPos, Quaternion.identity);
+        lastLevel.GetComponent<LevelScript>().SetLevelSpeed(lastLevelSpeed);
         levelList.Add(lastLevel);
 
         SaveGameProgress();
@@ -157,7 +162,6 @@ public class GameManager : MonoBehaviour
 
     private void SaveGameProgress()
     {
-        levelDataList.RemoveAt(0);
         levelDataList.Add(lastLevel.GetComponent<LevelScript>().GetLevelData());
         FileHandler.WriteJson<LevelData>("level_data", levelDataList);
         FileHandler.WriteFile("current_level", currentLevelCount.ToString());
@@ -182,12 +186,10 @@ public class GameManager : MonoBehaviour
     {
         if (currentLevelCount > 10)
         {
-            levelDataList.Clear();
-            foreach (GameObject level in levelList)
+            for (int i = 0; i < levelDataList.Count; i++)
             {
-                levelDataList.Add(level.GetComponent<LevelScript>().IncreaseLevelSpeed(speedModifier));
+                levelDataList[i] = levelList[i].GetComponent<LevelScript>().IncreaseLevelSpeed(speedModifier);
             }
-            FileHandler.WriteJson<LevelData>("level_data", levelDataList);
         }
         ContinueGame();
     }
@@ -209,11 +211,21 @@ public class GameManager : MonoBehaviour
     {
         currentLevelCount = 1;
         FileHandler.WriteFile("current_level", currentLevelCount.ToString());
+        FileHandler.WriteJson<LevelData>("level_data", levelDataList);
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     private void HUDAnimation()
     {
         HUD.GetComponent<Animation>().Play();
+    }
+    private void OnApplicationQuit()
+    {
+        //if player quits the game after passed the level
+        if(pauseScreen.activeInHierarchy)
+        {
+            levelDataList.RemoveAt(0);
+            FileHandler.WriteJson<LevelData>("level_data", levelDataList);
+        }
     }
 
     public void ExitGame()
