@@ -10,42 +10,46 @@ public class Chunk
 
     private float _resolution;
     private int _chunkLength;
+    private int _chunkWidth;
 
 
-    public Chunk(float cellSize, int chunkLength, float terrainNoise)
+    public Chunk(float cellSize, int chunkLength, int chunkWidth, NoiseData noiseData)
     {
         _resolution = cellSize;
         _chunkLength = chunkLength;
+        _chunkWidth = chunkWidth;
 
         mesh = new Mesh();
 
-        vertices = new Vector3[(chunkLength + 1)*(chunkLength + 1)];
-        triangles = new int[chunkLength *  chunkLength* 6];
+        vertices = new Vector3[(chunkLength + 1)*(chunkWidth + 1)];
+        triangles = new int[chunkLength * chunkWidth * 6];
 
-        UpdateChunk(terrainNoise);
+        UpdateChunk(noiseData);
 
         mesh.vertices = vertices;
         mesh.triangles = triangles;
 
     }
-    private void UpdateChunk(float terrainNoise)
+    private void UpdateChunk(NoiseData noiseData)
     {
         int tris = 0;
         int verts = 0;
         float vertexOffset = _resolution * 0.5f;
 
-        for (int x = 0; x <= _chunkLength; x++)
+        float[,] noiseMap = Noise.GenerateNoiseMap(noiseData);
+
+
+        for (int x = 0; x <= _chunkWidth; x++)
         {
             for (int z = 0; z <= _chunkLength; z++)
             {
-                float y = Mathf.PerlinNoise(x * terrainNoise, z * terrainNoise);
-                vertices[verts] = new Vector3((x * _resolution) - vertexOffset, y, (z * _resolution) - vertexOffset);
+                vertices[verts] = new Vector3((x * _resolution) - vertexOffset, noiseData.heightMultiplier.Evaluate(noiseMap[x, z]), (z * _resolution) - vertexOffset);
                 verts++;
             }
         }
         verts = 0;
 
-        for (int x = 0; x < _chunkLength; x++)
+        for (int x = 0; x < _chunkWidth; x++)
         {
             for (int z = 0; z < _chunkLength; z++)
             {
@@ -60,15 +64,16 @@ public class Chunk
         }
 
     }
-    public void UpdateChunk(float resolution, int chunkLength,float terrainNoise)
+    public void UpdateChunk(float resolution, int chunkLength, int chunkWidth, NoiseData noiseData)
     {
         _resolution = resolution;
         _chunkLength = chunkLength;
+        _chunkWidth = chunkWidth;
 
-        vertices = new Vector3[(chunkLength + 1) * (chunkLength + 1)];
-        triangles = new int[chunkLength * chunkLength * 6];
+        vertices = new Vector3[(chunkLength + 1) * (chunkWidth + 1)];
+        triangles = new int[chunkLength * chunkWidth * 6];
 
-        UpdateChunk(terrainNoise);
+        UpdateChunk(noiseData);
 
         mesh.vertices = vertices;
         mesh.triangles = triangles;
