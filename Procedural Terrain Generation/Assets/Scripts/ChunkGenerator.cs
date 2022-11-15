@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 public class ChunkGenerator : MonoBehaviour
@@ -8,63 +9,106 @@ public class ChunkGenerator : MonoBehaviour
     public float resolution = 1;
     public int chunkLength = 1;
     public int chunkWidth = 1;
-    public int chunkSize = 1;
+    public int chunkRenderRadius = 1;
+    public bool autoGenerate = false;
+
     public Material material;
     private MeshFilter meshFilter;
     private MeshCollider meshCollider;
     public NoiseData noiseAttributes;
-    Chunk[,] chunks;
-
+    public Transform player;
+    private TerrainData terrainData = new TerrainData();
+    private Vector2 lastSpawnPos;
+    
     void Start()
     {
-        CreateChunks();
+        //load player position before start if needed
+        GenerateChunks();
     }
-    public void CreateChunks()
+
+    public void GenerateChunks()
     {
-        chunks = new Chunk[chunkSize, chunkSize];
-        for (int x = 0; x < chunkSize; x++)
+        int spawnIndexX = Mathf.FloorToInt(player.position.x / chunkWidth);
+        int spawnIndexZ = Mathf.FloorToInt(player.position.z / chunkLength);
+
+        if (terrainData.GetChunkCount() == 0)
         {
-            for (int z = 0; z < chunkSize; z++)
+            //createchunk by chunkRenderRadius around the player
+            lastSpawnPos = new Vector2(spawnIndexX, spawnIndexZ);
+
+            for (int i = -chunkRenderRadius; i <= chunkRenderRadius; i++)
             {
-                CreateChunk(x,z);
+                for (int j = -chunkRenderRadius; j <= chunkRenderRadius; j++)
+                {
+
+                    CreateChunk(spawnIndexX + i, spawnIndexZ + j);
+                }
             }
         }
-    }
-    public void UpdateChunks()
-    {
-        if(chunks != null)
+        else
         {
-            foreach (Chunk chunk in chunks)
+            //generate necessary chunks
+            //terrainData.GetActiveChunkCount() != Mathf.Pow((chunkRenderRadius * 2 + 1), 2)
+            if (Vector2.Distance(lastSpawnPos, new Vector2(spawnIndexX, spawnIndexZ)) > 0)
             {
-                if (chunk != null)
+                terrainData.UnloadChunks();
+                for (int i = -chunkRenderRadius; i <= chunkRenderRadius; i++)
                 {
-                    chunk.UpdateChunk(resolution, chunkLength, chunkWidth, noiseAttributes);
-                    meshFilter.sharedMesh.vertices = chunk.GetVertices();
-                    meshFilter.sharedMesh.triangles = chunk.GetTriangles();
-                    meshFilter.sharedMesh.RecalculateNormals();
-                    meshCollider.sharedMesh = meshFilter.sharedMesh;
+                    for (int j = -chunkRenderRadius; j <= chunkRenderRadius; j++)
+                    {
+                        Vector2 pos = new Vector2(spawnIndexX + i, spawnIndexZ + j);
+                        lastSpawnPos = new Vector2(spawnIndexX, spawnIndexZ);
+
+                        if (terrainData.FindChunk(pos) == true)
+                        {
+                            terrainData.LoadChunk(pos);
+                        }
+                        else
+                        {
+                            CreateChunk(spawnIndexX + i, spawnIndexZ + j);
+                        }
+                    }
                 }
             }
         }
         
     }
+
+    public void UpdateChunks()
+    {
+        if (terrainData != null)
+        {
+            foreach (var chunk in terrainData.GetChunks())
+            {
+                chunk.UpdateChunk(resolution, chunkLength, chunkWidth, noiseAttributes);
+                chunk.UpdateThread(ApplyMesh);
+            }
+        }
+
+    }
     private void CreateChunk(int x, int z)
     {
-        Vector3 chunkOffset = new Vector3(x * chunkLength * resolution, 0, z * chunkLength * resolution);
+        Vector3 chunkOffset = new Vector3(x * chunkWidth * resolution, 0, z * chunkLength * resolution);
 
-        chunks[x,z] = new Chunk(resolution, chunkLength, chunkWidth, noiseAttributes);
+        GameObject chunkObject = new GameObject("Chunk");
+        chunkObject.transform.parent = transform;
 
-        GameObject newChunk = new GameObject("Chunk");
-        newChunk.transform.position = chunkOffset;
-        meshFilter = newChunk.AddComponent<MeshFilter>();
-        meshFilter.sharedMesh = chunks[x, z].mesh;
+        Chunk newChunk  = new Chunk(chunkObject, resolution, chunkLength, chunkWidth, noiseAttributes);
 
-        meshCollider = newChunk.AddComponent<MeshCollider>();
-        newChunk.AddComponent<MeshRenderer>().material = material;
+        terrainData.AddChunk(new Vector2(x, z), newChunk);
+        newChunk.chunkObject.transform.position = chunkOffset;
+        newChunk.UpdateThread(ApplyMesh);
+    }
+    private void ApplyMesh(Chunk chunk)
+    {
+        meshFilter = chunk.chunkObject.AddComponent<MeshFilter>();
+        meshCollider = chunk.chunkObject.AddComponent<MeshCollider>();
+        chunk.chunkObject.AddComponent<MeshRenderer>().material = material;
 
-        meshFilter.sharedMesh.vertices = chunks[x,z].GetVertices();
-        meshFilter.sharedMesh.triangles = chunks[x, z].GetTriangles();
-        meshFilter.sharedMesh.RecalculateNormals();
+        chunk.mesh.vertices = chunk.GetVertices();
+        chunk.mesh.triangles = chunk.GetTriangles();
+        chunk.mesh.RecalculateNormals();
+        meshFilter.sharedMesh = chunk.mesh;
         meshCollider.sharedMesh = meshFilter.sharedMesh;
     }
 
@@ -73,6 +117,18 @@ public class ChunkGenerator : MonoBehaviour
         //always keep the same as chunk sizes
         noiseAttributes.width = chunkWidth;
         noiseAttributes.length = chunkLength;
+    }
+    private void Update()
+    {
+        GenerateChunks();
+        if(Chunk.ThreadInfoQueue.Count > 0)
+        {
+            for (int i = 0; i < Chunk.ThreadInfoQueue.Count; i++)
+            {
+                ThreadInfo<Chunk> threadInfo = Chunk.ThreadInfoQueue.Dequeue();
+                threadInfo.callback(threadInfo.param);
+            }
+        }
     }
 
 }

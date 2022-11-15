@@ -1,10 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Collections;
+using System.Threading;
+using System;
 
 public class Chunk
 {
+    public GameObject chunkObject;
     public Mesh mesh;
+    private NoiseData _noiseData;
     private Vector3[] vertices;
     private int[] triangles;
 
@@ -12,71 +16,74 @@ public class Chunk
     private int _chunkLength;
     private int _chunkWidth;
 
+    public static Queue<ThreadInfo<Chunk>> ThreadInfoQueue = new Queue<ThreadInfo<Chunk>>();
 
-    public Chunk(float cellSize, int chunkLength, int chunkWidth, NoiseData noiseData)
+    public Chunk(GameObject obj, float cellSize, int chunkLength, int chunkWidth, NoiseData noiseData)
     {
         _resolution = cellSize;
         _chunkLength = chunkLength;
         _chunkWidth = chunkWidth;
+        _noiseData = noiseData;
+        chunkObject = obj;
 
         mesh = new Mesh();
-
-        vertices = new Vector3[(chunkLength + 1)*(chunkWidth + 1)];
-        triangles = new int[chunkLength * chunkWidth * 6];
-
-        UpdateChunk(noiseData);
-
-        mesh.vertices = vertices;
-        mesh.triangles = triangles;
-
+        vertices = new Vector3[(_chunkLength + 1) * (_chunkWidth + 1)];
+        triangles = new int[_chunkLength * _chunkWidth * 6];
     }
-    private void UpdateChunk(NoiseData noiseData)
+    public void UpdateThread(Action<Chunk> callback)
     {
-        int tris = 0;
-        int verts = 0;
-        float vertexOffset = _resolution * 0.5f;
-
-        float[,] noiseMap = Noise.GenerateNoiseMap(noiseData);
-
-
-        for (int x = 0; x <= _chunkWidth; x++)
+        ThreadStart threadStart = delegate
         {
-            for (int z = 0; z <= _chunkLength; z++)
+            UpdateChunk(callback);
+        };
+        new Thread(threadStart).Start();
+    }
+    private void UpdateChunk(Action<Chunk> callback)
+    {
+        lock(ThreadInfoQueue)
+        {
+            int tris = 0;
+            int verts = 0;
+            float vertexOffset = _resolution * 0.5f;
+
+            float[,] noiseMap = Noise.GenerateNoiseMap(_noiseData);
+
+            for (int x = 0; x <= _chunkWidth; x++)
             {
-                vertices[verts] = new Vector3((x * _resolution) - vertexOffset, noiseData.heightMultiplier.Evaluate(noiseMap[x, z]), (z * _resolution) - vertexOffset);
+                for (int z = 0; z <= _chunkLength; z++)
+                {
+                    vertices[verts] = new Vector3((x * _resolution) - vertexOffset, _noiseData.heightMultiplier.Evaluate(noiseMap[x, z]), (z * _resolution) - vertexOffset);
+                    verts++;
+                }
+            }
+            verts = 0;
+
+            for (int x = 0; x < _chunkWidth; x++)
+            {
+                for (int z = 0; z < _chunkLength; z++)
+                {
+                    triangles[tris] = verts;
+                    triangles[tris + 1] = triangles[tris + 4] = verts + 1;
+                    triangles[tris + 2] = triangles[tris + 3] = verts + (_chunkLength + 1);
+                    triangles[tris + 5] = verts + (_chunkLength + 1) + 1;
+                    verts++;
+                    tris += 6;
+                }
                 verts++;
             }
-        }
-        verts = 0;
 
-        for (int x = 0; x < _chunkWidth; x++)
-        {
-            for (int z = 0; z < _chunkLength; z++)
-            {
-                triangles[tris] = verts;
-                triangles[tris + 1] = triangles[tris + 4] = verts + 1;
-                triangles[tris + 2] = triangles[tris + 3] = verts + (_chunkLength + 1);
-                triangles[tris + 5] = verts + (_chunkLength + 1) + 1;
-                verts++;
-                tris += 6;
-            }
-            verts++;
+            ThreadInfoQueue.Enqueue(new ThreadInfo<Chunk>(callback, this));
         }
-
     }
     public void UpdateChunk(float resolution, int chunkLength, int chunkWidth, NoiseData noiseData)
     {
         _resolution = resolution;
         _chunkLength = chunkLength;
         _chunkWidth = chunkWidth;
+        _noiseData = noiseData;
 
-        vertices = new Vector3[(chunkLength + 1) * (chunkWidth + 1)];
-        triangles = new int[chunkLength * chunkWidth * 6];
-
-        UpdateChunk(noiseData);
-
-        mesh.vertices = vertices;
-        mesh.triangles = triangles;
+        vertices = new Vector3[(_chunkLength + 1) * (_chunkWidth + 1)];
+        triangles = new int[_chunkLength * _chunkWidth * 6];
     }
     public int[] GetTriangles()
     {

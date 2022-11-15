@@ -11,9 +11,13 @@ public class ChunkGenerationEditor : Editor
         {
             chunkGenerator.UpdateChunks();
         }
+        if(chunkGenerator.autoGenerate == true)
+        {
+            chunkGenerator.GenerateChunks();
+        }
         if(GUILayout.Button("Generate Chunks"))
         {
-            chunkGenerator.CreateChunks();
+            chunkGenerator.GenerateChunks();
         }
     }
     
