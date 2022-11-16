@@ -9,15 +9,15 @@ public class ChunkGenerationEditor : Editor
         ChunkGenerator chunkGenerator = (ChunkGenerator)target;
         if(DrawDefaultInspector())
         {
-            chunkGenerator.UpdateChunks();
+            chunkGenerator.UpdateChunksInEditor();
         }
         if(chunkGenerator.autoGenerate == true)
         {
-            chunkGenerator.GenerateChunks();
+            chunkGenerator.GenerateChunksInEditor();
         }
         if(GUILayout.Button("Generate Chunks"))
         {
-            chunkGenerator.GenerateChunks();
+            chunkGenerator.GenerateChunksInEditor();
         }
     }
     

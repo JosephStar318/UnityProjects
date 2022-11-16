@@ -8,7 +8,6 @@ public class ChunkGenerator : MonoBehaviour
 {
     public float resolution = 1;
     public int chunkLength = 1;
-    public int chunkWidth = 1;
     public int chunkRenderRadius = 1;
     public bool autoGenerate = false;
 
@@ -28,7 +27,7 @@ public class ChunkGenerator : MonoBehaviour
 
     public void GenerateChunks()
     {
-        int spawnIndexX = Mathf.FloorToInt(player.position.x / chunkWidth);
+        int spawnIndexX = Mathf.FloorToInt(player.position.x / chunkLength);
         int spawnIndexZ = Mathf.FloorToInt(player.position.z / chunkLength);
 
         if (terrainData.GetChunkCount() == 0)
@@ -71,32 +70,75 @@ public class ChunkGenerator : MonoBehaviour
                 }
             }
         }
-        
+    }
+    public void GenerateChunksInEditor()
+    {
+        int spawnIndexX = Mathf.FloorToInt(player.position.x / chunkLength);
+        int spawnIndexZ = Mathf.FloorToInt(player.position.z / chunkLength);
+
+        if (terrainData.GetChunkCount() == 0)
+        {
+            //createchunk by chunkRenderRadius around the player
+            lastSpawnPos = new Vector2(spawnIndexX, spawnIndexZ);
+
+            for (int i = -chunkRenderRadius; i <= chunkRenderRadius; i++)
+            {
+                for (int j = -chunkRenderRadius; j <= chunkRenderRadius; j++)
+                {
+                    CreateChunkInEditor(spawnIndexX + i, spawnIndexZ + j);
+                }
+            }
+        }
     }
 
-    public void UpdateChunks()
+    public void UpdateChunksInEditor()
     {
         if (terrainData != null)
         {
             foreach (var chunk in terrainData.GetChunks())
             {
-                chunk.UpdateChunk(resolution, chunkLength, chunkWidth, noiseAttributes);
-                chunk.UpdateThread(ApplyMesh);
+                chunk.UpdateChunkInEditor(resolution, chunkLength, noiseAttributes);
+
+                meshFilter = chunk.chunkObject.GetComponent<MeshFilter>();
+                meshCollider = chunk.chunkObject.GetComponent<MeshCollider>();
+
+                meshFilter.sharedMesh = chunk.GetMesh();
+                meshCollider.sharedMesh = meshFilter.sharedMesh;
             }
         }
-
     }
-    private void CreateChunk(int x, int z)
+    public void CreateChunkInEditor(int x, int z)
     {
-        Vector3 chunkOffset = new Vector3(x * chunkWidth * resolution, 0, z * chunkLength * resolution);
+        Vector2 chunkOffset = new Vector2(x * chunkLength * resolution, z * chunkLength * resolution);
 
         GameObject chunkObject = new GameObject("Chunk");
         chunkObject.transform.parent = transform;
 
-        Chunk newChunk  = new Chunk(chunkObject, resolution, chunkLength, chunkWidth, noiseAttributes);
+        Chunk newChunk = new Chunk(chunkObject, resolution, chunkLength, noiseAttributes, chunkOffset);
 
         terrainData.AddChunk(new Vector2(x, z), newChunk);
-        newChunk.chunkObject.transform.position = chunkOffset;
+        newChunk.chunkObject.transform.position = new Vector3(chunkOffset.x,0,chunkOffset.y);
+
+        newChunk.UpdateChunkInEditor(resolution, chunkLength, noiseAttributes);
+
+        meshFilter = newChunk.chunkObject.AddComponent<MeshFilter>();
+        meshCollider = newChunk.chunkObject.AddComponent<MeshCollider>();
+        newChunk.chunkObject.AddComponent<MeshRenderer>().material = material;
+
+        meshFilter.sharedMesh = newChunk.GetMesh();
+        meshCollider.sharedMesh = meshFilter.sharedMesh;
+    }
+    private void CreateChunk(int x, int z)
+    {
+        Vector2 chunkOffset = new Vector2(x * chunkLength * resolution, z * chunkLength * resolution);
+
+        GameObject chunkObject = new GameObject("Chunk");
+        chunkObject.transform.parent = transform;
+
+        Chunk newChunk = new Chunk(chunkObject, resolution, chunkLength, noiseAttributes, chunkOffset);
+
+        terrainData.AddChunk(new Vector2(x, z), newChunk);
+        newChunk.chunkObject.transform.position = new Vector3(chunkOffset.x, 0, chunkOffset.y);
         newChunk.UpdateThread(ApplyMesh);
     }
     private void ApplyMesh(Chunk chunk)
@@ -105,18 +147,14 @@ public class ChunkGenerator : MonoBehaviour
         meshCollider = chunk.chunkObject.AddComponent<MeshCollider>();
         chunk.chunkObject.AddComponent<MeshRenderer>().material = material;
 
-        chunk.mesh.vertices = chunk.GetVertices();
-        chunk.mesh.triangles = chunk.GetTriangles();
-        chunk.mesh.RecalculateNormals();
-        meshFilter.sharedMesh = chunk.mesh;
+        meshFilter.sharedMesh = chunk.GetMesh();
         meshCollider.sharedMesh = meshFilter.sharedMesh;
     }
-
+ 
     private void OnValidate()
     {
         //always keep the same as chunk sizes
-        noiseAttributes.width = chunkWidth;
-        noiseAttributes.length = chunkLength;
+        noiseAttributes.length = chunkLength + 2;
     }
     private void Update()
     {
@@ -130,7 +168,6 @@ public class ChunkGenerator : MonoBehaviour
             }
         }
     }
-
 }
 
 
