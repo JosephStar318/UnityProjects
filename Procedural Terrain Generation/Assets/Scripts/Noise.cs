@@ -59,21 +59,17 @@ public static class Noise
                 {
                     minNoiseHeight = noiseHeight;
                 }
-
                 noiseMap[x, z] = noiseHeight;
-               
             }
         }
         for (int x = 0; x <= noiseData.length; x++)
         {
             for (int z = 0; z <= noiseData.length; z++)
             {
-                float normalizedHeight = (noiseMap[x, z] + 1) / (maxPossibleHeight);
+                float normalizedHeight = (noiseMap[x, z] + 1) / (2f * maxPossibleHeight *1.75f);
                 noiseMap[x, z] = Mathf.Clamp(normalizedHeight, 0, int.MaxValue);
             }
         }
-
-
         return noiseMap;
     }
 }

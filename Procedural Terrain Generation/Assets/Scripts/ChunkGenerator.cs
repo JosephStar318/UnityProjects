@@ -24,7 +24,6 @@ public class ChunkGenerator : MonoBehaviour
         //load player position before start if needed
         GenerateChunks();
     }
-
     public void GenerateChunks()
     {
         int spawnIndexX = Mathf.FloorToInt(player.position.x / chunkLength);
@@ -39,32 +38,36 @@ public class ChunkGenerator : MonoBehaviour
             {
                 for (int j = -chunkRenderRadius; j <= chunkRenderRadius; j++)
                 {
-
-                    CreateChunk(spawnIndexX + i, spawnIndexZ + j);
+                    //for spherical radius 
+                    if (i * i + j * j < chunkRenderRadius * chunkRenderRadius)
+                        CreateChunk(spawnIndexX + i, spawnIndexZ + j);
                 }
             }
         }
         else
         {
             //generate necessary chunks
-            //terrainData.GetActiveChunkCount() != Mathf.Pow((chunkRenderRadius * 2 + 1), 2)
-            if (Vector2.Distance(lastSpawnPos, new Vector2(spawnIndexX, spawnIndexZ)) > 0)
+            if (Vector2.Distance(lastSpawnPos, new Vector2(spawnIndexX, spawnIndexZ)) > 0 || terrainData.GetActiveChunkCount() != Mathf.Pow((chunkRenderRadius * 2 + 1), 2))
             {
                 terrainData.UnloadChunks();
                 for (int i = -chunkRenderRadius; i <= chunkRenderRadius; i++)
                 {
                     for (int j = -chunkRenderRadius; j <= chunkRenderRadius; j++)
                     {
-                        Vector2 pos = new Vector2(spawnIndexX + i, spawnIndexZ + j);
-                        lastSpawnPos = new Vector2(spawnIndexX, spawnIndexZ);
+                        //for spherical radius 
+                        if (i * i + j * j < chunkRenderRadius * chunkRenderRadius)
+                        {
+                            Vector2 pos = new Vector2(spawnIndexX + i, spawnIndexZ + j);
+                            lastSpawnPos = new Vector2(spawnIndexX, spawnIndexZ);
 
-                        if (terrainData.FindChunk(pos) == true)
-                        {
-                            terrainData.LoadChunk(pos);
-                        }
-                        else
-                        {
-                            CreateChunk(spawnIndexX + i, spawnIndexZ + j);
+                            if (terrainData.FindChunk(pos) == true)
+                            {
+                                terrainData.LoadChunk(pos);
+                            }
+                            else
+                            {
+                                CreateChunk(spawnIndexX + i, spawnIndexZ + j);
+                            }
                         }
                     }
                 }
@@ -85,7 +88,37 @@ public class ChunkGenerator : MonoBehaviour
             {
                 for (int j = -chunkRenderRadius; j <= chunkRenderRadius; j++)
                 {
-                    CreateChunkInEditor(spawnIndexX + i, spawnIndexZ + j);
+                    //for spherical radius 
+                    if (i*i + j*j < chunkRenderRadius*chunkRenderRadius)
+                        CreateChunkInEditor(spawnIndexX + i, spawnIndexZ + j);
+                }
+            }
+        }
+        else
+        {
+            if (Vector2.Distance(lastSpawnPos, new Vector2(spawnIndexX, spawnIndexZ)) > 0 || terrainData.GetActiveChunkCount() != Mathf.Pow((chunkRenderRadius * 2 + 1), 2))
+            {
+                terrainData.UnloadChunks();
+                for (int i = -chunkRenderRadius; i <= chunkRenderRadius; i++)
+                {
+                    for (int j = -chunkRenderRadius; j <= chunkRenderRadius; j++)
+                    {
+                        //for spherical radius 
+                        if (i * i + j * j < chunkRenderRadius * chunkRenderRadius)
+                        {
+                            Vector2 pos = new Vector2(spawnIndexX + i, spawnIndexZ + j);
+                            lastSpawnPos = new Vector2(spawnIndexX, spawnIndexZ);
+
+                            if (terrainData.FindChunk(pos) == true)
+                            {
+                                terrainData.LoadChunk(pos);
+                            }
+                            else
+                            {
+                                CreateChunk(spawnIndexX + i, spawnIndexZ + j);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -97,13 +130,16 @@ public class ChunkGenerator : MonoBehaviour
         {
             foreach (var chunk in terrainData.GetChunks())
             {
-                chunk.UpdateChunkInEditor(resolution, chunkLength, noiseAttributes);
+                if(chunk != null)
+                {
+                    chunk.UpdateChunkInEditor(resolution, chunkLength, noiseAttributes);
 
-                meshFilter = chunk.chunkObject.GetComponent<MeshFilter>();
-                meshCollider = chunk.chunkObject.GetComponent<MeshCollider>();
+                    meshFilter = chunk.chunkObject.GetComponent<MeshFilter>();
+                    meshCollider = chunk.chunkObject.GetComponent<MeshCollider>();
 
-                meshFilter.sharedMesh = chunk.GetMesh();
-                meshCollider.sharedMesh = meshFilter.sharedMesh;
+                    meshFilter.sharedMesh = chunk.GetMesh();
+                    meshCollider.sharedMesh = meshFilter.sharedMesh;
+                }
             }
         }
     }
@@ -150,7 +186,6 @@ public class ChunkGenerator : MonoBehaviour
         meshFilter.sharedMesh = chunk.GetMesh();
         meshCollider.sharedMesh = meshFilter.sharedMesh;
     }
- 
     private void OnValidate()
     {
         //always keep the same as chunk sizes

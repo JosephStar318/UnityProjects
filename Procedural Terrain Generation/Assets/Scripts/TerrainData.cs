@@ -24,6 +24,7 @@ public class TerrainData
     {
         if(chunkDictionary.Remove(chunkPos))
         {
+            activeChunkCount--;
             Debug.Log("Chunk Successfully removed");
             return true;
         }
@@ -73,8 +74,4 @@ public class TerrainData
     {
         return chunkDictionary.ContainsKey(position);
     }
-
-
-
-
 }

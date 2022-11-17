@@ -9,6 +9,7 @@ public class Chunk
     //private Noise noise = new Noise();
     public GameObject chunkObject;
     public Mesh mesh;
+    private Vector3[] _tempNormals;
     private NoiseData _noiseData;
     private Vector3[] vertices;
     private Vector3[] borderedVertices;
@@ -174,14 +175,14 @@ public class Chunk
     }
     public Mesh GetMesh()
     {
-        Mesh tempMesh = new Mesh();
-        tempMesh.SetVertices(borderedVertices);
-        tempMesh.triangles = borderedTriangles;
-        tempMesh.RecalculateNormals();
+        mesh.SetVertices(borderedVertices);
+        mesh.triangles = borderedTriangles;
+        mesh.RecalculateNormals();
+        _tempNormals = mesh.normals;
 
-        mesh.SetVertices(vertices);
         mesh.triangles = triangles;
-        mesh.SetNormals(GenerateBorderlessNormalMap(tempMesh.normals, _borderedChunkLength));
+        mesh.vertices = vertices;
+        mesh.SetNormals(GenerateBorderlessNormalMap(_tempNormals, _borderedChunkLength));
 
         return mesh;
     }

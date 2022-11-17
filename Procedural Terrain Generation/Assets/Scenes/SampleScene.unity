@@ -354,6 +354,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerArmature
       objectReference: {fileID: 0}
+    - target: {fileID: 4416926081852918490, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      propertyPath: MoveSpeed
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4416926081852918490, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      propertyPath: SprintSpeed
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 4416926081852918491, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      propertyPath: m_SlopeLimit
+      value: 60
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
 --- !u!1 &1094940013
@@ -453,14 +465,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resolution: 1
-  chunkLength: 100
-  chunkRenderRadius: 3
+  chunkLength: 32
+  chunkRenderRadius: 12
   autoGenerate: 0
   material: {fileID: 2100000, guid: 2f2ac1943093dc94186357d9fd62dcaa, type: 2}
   noiseAttributes:
-    length: 102
+    length: 34
     numOfLayers: 5
-    scale: 50
+    scale: 200
     heightMultiplier:
       serializedVersion: 2
       m_Curve:
@@ -474,47 +486,56 @@ MonoBehaviour:
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
-        time: 0.12010467
-        value: -0.005051613
-        inSlope: 0
-        outSlope: 0
+        time: 0.07632086
+        value: 4.5157003
+        inSlope: 43.30029
+        outSlope: 43.30029
         tangentMode: 0
         weightedMode: 0
-        inWeight: 0.1077762
+        inWeight: 0.70089686
         outWeight: 0.49138203
       - serializedVersion: 3
-        time: 0.20227227
-        value: 2.8256865
-        inSlope: 0
-        outSlope: 0
+        time: 0.19908318
+        value: 6.726944
+        inSlope: 6.7596846
+        outSlope: 6.7596846
         tangentMode: 0
         weightedMode: 0
-        inWeight: 0.32046762
-        outWeight: 0.33333334
+        inWeight: 0.96400315
+        outWeight: 0.25774923
       - serializedVersion: 3
-        time: 0.5225344
-        value: 5.0095053
-        inSlope: 0
-        outSlope: 0
+        time: 0.2918379
+        value: 42.17713
+        inSlope: 122.51661
+        outSlope: 122.51661
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334
-        outWeight: 0.33333334
+        outWeight: 0.8181392
       - serializedVersion: 3
-        time: 0.9838257
-        value: 20
-        inSlope: 21.5056
-        outSlope: 21.5056
+        time: 0.36692223
+        value: 70.091095
+        inSlope: -36.445816
+        outSlope: -36.445816
         tangentMode: 0
         weightedMode: 0
-        inWeight: 0.25058877
+        inWeight: 1
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.4291341
+        value: 122.044914
+        inSlope: 48.266663
+        outSlope: 48.266663
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 1
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
     persistence: 0.5
     lacunarity: 2.55
-    randomizerSeed: 49
+    randomizerSeed: 41
   player: {fileID: 1635433919}
 --- !u!1001 &1616271126
 PrefabInstance:
