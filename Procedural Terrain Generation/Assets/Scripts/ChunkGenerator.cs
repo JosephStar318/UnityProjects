@@ -115,7 +115,7 @@ public class ChunkGenerator : MonoBehaviour
                             }
                             else
                             {
-                                CreateChunk(spawnIndexX + i, spawnIndexZ + j);
+                                CreateChunkInEditor(spawnIndexX + i, spawnIndexZ + j);
                             }
                         }
                     }
@@ -188,7 +188,7 @@ public class ChunkGenerator : MonoBehaviour
     }
     private void OnValidate()
     {
-        //always keep the same as chunk sizes
+        //always keep the same as bordered chunk sizes
         noiseAttributes.length = chunkLength + 2;
     }
     private void Update()
