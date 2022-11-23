@@ -29,6 +29,8 @@ public class MyCharachterController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = false;
     }
 
     void Update()
