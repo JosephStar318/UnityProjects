@@ -4,14 +4,19 @@ using UnityEngine;
 
 public class Weapon : MonoBehaviour
 {
-    public ParticleSystem fireVFX;
+    public GameObject fireVFX;
+    public GameObject bulletImpactVFX;
     public AudioClip fireSFX;
+    public AudioClip emptyClipSFX;
+    public AudioClip reloadSFX;
 
+    public Transform muzzleFlashPos;
     public WeaponType type;
     public float accuracy;
     public float fireRate;
     public float dammage;
     public float recoil;
+    public float range;
     public int ammoInClip;
     public int maxAmmoInClip;
     //burst mode...

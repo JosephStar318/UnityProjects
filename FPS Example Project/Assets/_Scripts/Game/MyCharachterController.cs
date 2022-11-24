@@ -6,6 +6,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class MyCharachterController : MonoBehaviour
 {
+    public static MyCharachterController Instance;
     public GameObject playerCamera;
 
     //physics
@@ -24,8 +25,15 @@ public class MyCharachterController : MonoBehaviour
     private float mouseY;
 
     public bool isSprinting;
+    public bool isAiming;
+    public bool isReloading;
+
     public Vector3 moveVector;
 
+    private void Awake()
+    {
+        Instance = this;
+    }
     void Start()
     {
         rb = GetComponent<Rigidbody>();
